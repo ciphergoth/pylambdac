@@ -2,7 +2,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb}
 \usepackage{hyperref}
-\usepackage{cite}
 \title{Ordinals}
 \author{Paul Crowley}
 \begin{document}
@@ -21,7 +20,7 @@ Ordinals are cool.
 
 \textbf{Successor:} If $\alpha$ is an ordinal, so is $\alpha \cup \{\alpha\}$; we call this the successor, or $\alpha + 1$. Proof: Since $\alpha$ is a transitive set, all its elements are subsets of $\alpha$ and therefore also subsets of $\alpha + 1$. By construction $\alpha$ is also a subset of $\alpha + 1$; therefore it's a transitive set. Since both $\alpha$ and all its elements are transitive sets, $\alpha + 1$ consists entirely of transitive sets. Therefore $\alpha + 1$ is an ordinal. This allows us to construct lots of ordinals:
 
-\begin{tabular}{ c c c }
+\begin{tabular}{ l l l }
 0 & $\{\}$ & $\{\}$ \\
 1 & $\{0\}$ & $\{\{\}\}$ \\
 2 & $\{0, 1\}$ & $\{\{\}, \{\{\}\}\}$ \\
@@ -42,21 +41,29 @@ In each case we have eg $3 = 2 + 1 = 2 \cup \{2\} = \{0, 1\} \cup \{2\} = \{0, 1
 
 \textbf{Set membership is well-founded:} The Axiom of Foundation guarantees that any nonempty set $S$ will have at least one element $x$ such that $\forall y \in S: y \not\in x$. We call this an $\in$-minimal element.
 
-\textbf{Within an ordinal, membership is trichotomous:} $\forall \beta_1, \beta_2, \in \alpha: \beta_1 \in \beta_2 \vee \beta_1 = \beta_2 \vee \beta_1 \ni \beta_2$. The price we pay for all our other proofs being so straightforward is that this one is a little tricky: \cite{1057102}
-
+\textbf{Proper subset ordinals are members:} If $\alpha_1, \alpha_2$ are ordinals such that $\alpha_2 \subsetneq \alpha_1$ then $\alpha_2 \in \alpha_1$. Proof: 
 \begin{itemize}
-\item we say that $x, y$ are \emph{incomparable} if they don't meet this condition. Suppose $\alpha$ is an ordinal with incomparable elements.
-\item Let $x \in \alpha$ be $\in$-minimal among all elements that are incomparable with some other element
-\item Let $y \in \alpha$ be $\in$-minimal among all elements that are incomparable with $x$.
-\item For any $z \in y$: since $y$ is $\in$-minimal among elements not comparable with $x$ we have that $z \in x \vee z = x \vee z \ni x$. In the last two cases we have $x \in y$, so we must have $z \in x$ ie $y \subseteq x$.
-\item For any $z \in x$: since $x$ is $\in$-minimal among elements incomparable with some other element we have that $z \in y \vee z = y \vee z \ni y$. In the last two cases we have $y \in x$, so we must have $z \in y$ ie $x \subseteq y$.
-\item Hence $x = y$, contradicting our initial assumption.
+\item If this is not so, we can construct an infinite descending chain of ordinals $\alpha_k$.
+\item Assume $\alpha_{k+1} \subsetneq \alpha_k$ and $\alpha_{k+1} \not\in \alpha_k$; this is what we're assuming by contradiction for $k=1$.
+\item Let $\alpha_{k+2}$ be an $\in$-minimal element of $\alpha_k \setminus \alpha_{k+1}$
+\item by $\in$-minimality $\alpha_{k+2} \cap (\alpha_k \setminus \alpha_{k+1}) = \emptyset$.
+\item By ordinal transitivity $\alpha_{k+2} \subseteq \alpha_k$; 
+\item Therefore $\alpha_{k+2} \subseteq \alpha_{k+1}$.
+\item Since $\alpha_{k+2} \in \alpha_k$ we have that $\alpha_{k+2} \neq \alpha_{k+1}$
+\item therefore $\alpha_{k+2} \subsetneq \alpha_{k+1}$ and $\alpha_{k+2} \not\in \alpha_{k+1}$
+\item By this means we can construct an infinite chain $\alpha_1 \ni \alpha_3 \ni \alpha_5 \ldots$; however this is disallowed by the Axiom of Foundation.
 \end{itemize}
 
-\textbf{Ordinals are trichotomous:} For any two ordinals $\alpha_1, \alpha_2$, $\alpha_1 \in \alpha_2 \vee \alpha_1 = \alpha_2 \vee \alpha_1 \ni \alpha_2$. Proof: both are elements of the ordinal $(\alpha_1 + 1) \cup (\alpha_2 + 1)$ and any two elements of the same ordinal are trichotomous.
+\textbf{Intersection:} The intersection of a set of ordinals is an ordinal; the proof is almost exactly the same as for the union case.
+
+\textbf{Ordinals are trichotomous:} For any two ordinals $\alpha, \beta$, $\alpha \in \beta \vee \alpha = \beta \vee \alpha \ni \beta$. Proof by contradiction: 
+\begin{itemize}
+\item Since both are ordinals, if neither is a member of the other then neither is a proper subset of the other.
+\item Given that they're not equal either, $\alpha \cap \beta \subsetneq \alpha$ and $\alpha \cap \beta \subsetneq \beta$
+\item $\alpha \cap \beta$ is an ordinal; therefore $\alpha \cap \beta \in \alpha$ and $\alpha \cap \beta \in \beta$
+\item $\alpha \cap \beta \in \alpha \cap \beta$, violating the Axiom of Foundation.
+\end{itemize}
 
 \textbf{Ordinals are well-ordered by membership:} this just puts together what we've already proven. This also means that the elements of an ordinal are well-ordered by membership, as required by the standard Von Neumann definition.
 
-\bibliography{bib}{}
-\bibliographystyle{alpha}
 \end{document}
