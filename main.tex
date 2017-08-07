@@ -39,16 +39,15 @@ In each case we have eg $3 = 2 + 1 = 2 \cup \{2\} = \{0, 1\} \cup \{2\} = \{0, 1
 
 \textbf{Set membership is asymmetric:} The Axiom of Foundation forbids sets such that $A \in A$ or $A \in B \in A$; set membership is therefore both irreflexive and antisymmetric.
 
-\textbf{Set membership is well-founded:} The Axiom of Foundation guarantees that any nonempty set $S$ will have at least one element $x$ such that $\forall y \in S: y \not\in x$. We call this an $\in$-minimal element.
+\textbf{Set membership is well-founded:} The Axiom of Foundation guarantees that any nonempty set $S$ will have at least one element $x$ such that $\forall y \in S: y \not\in x$ ie $x \cap S = \emptyset$. We call this an $\in$-minimal element.
 
 \textbf{Proper subset ordinals are members:} If $\alpha_1, \alpha_2$ are ordinals such that $\alpha_2 \subsetneq \alpha_1$ then $\alpha_2 \in \alpha_1$. Proof: 
 \begin{itemize}
 \item If this is not so, we can construct an infinite descending chain of ordinals $\alpha_k$.
 \item Assume $\alpha_{k+1} \subsetneq \alpha_k$ and $\alpha_{k+1} \not\in \alpha_k$; this is what we're assuming by contradiction for $k=1$.
-\item Let $\alpha_{k+2}$ be an $\in$-minimal element of $\alpha_k \setminus \alpha_{k+1}$
-\item by $\in$-minimality $\alpha_{k+2} \cap (\alpha_k \setminus \alpha_{k+1}) = \emptyset$.
-\item By ordinal transitivity $\alpha_{k+2} \subseteq \alpha_k$; 
-\item Therefore $\alpha_{k+2} \subseteq \alpha_{k+1}$.
+\item Let $\alpha_{k+2}$ be an $\in$-minimal element of $\alpha_k \setminus \alpha_{k+1}$; then $\alpha_{k+2} \cap (\alpha_k \setminus \alpha_{k+1}) = \emptyset$.
+\item $\alpha_{k+2} \in \alpha_k$, so by ordinal transitivity $\alpha_{k+2} \subseteq \alpha_k$ 
+\item Every element of $\alpha_{k+2}$ is a member of $\alpha_k$ but not $\alpha_k \setminus \alpha_{k+1}$. Therefore $\alpha_{k+2} \subseteq \alpha_{k+1}$
 \item Since $\alpha_{k+2} \in \alpha_k$ we have that $\alpha_{k+2} \neq \alpha_{k+1}$
 \item therefore $\alpha_{k+2} \subsetneq \alpha_{k+1}$ and $\alpha_{k+2} \not\in \alpha_{k+1}$
 \item By this means we can construct an infinite chain $\alpha_1 \ni \alpha_3 \ni \alpha_5 \ldots$; however this is disallowed by the Axiom of Foundation.
