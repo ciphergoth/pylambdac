@@ -2,28 +2,14 @@
 
 import lark
 
-class Transformer(lark.Transformer):
-    def subexpr(self, args):
-        assert len(args) == 1
-        return args[0]
-
-    def expr(self, args):
-        if len(args) == 1:
-            return args[0]
-        assert len(args) == 2
-        return lark.Tree('apply', [args[0], args[1]])
-
 def main():
-    #transf = Transformer()
-
     with open("grammar.lark") as f:
         l = lark.Lark(f.read())
 
-    for expr in ["x", "x y", "x y z", "x (y z)"]:
+    for expr in ["x", "x y", "x y z", "x (y z)", "λx y. y x"]:
         print(expr)
         parse = l.parse(expr)
         print(parse.pretty())
-        #print(transf.transform(parse).pretty())
 
 if __name__ == '__main__':
     main()

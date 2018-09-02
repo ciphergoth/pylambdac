@@ -1,6 +1,7 @@
 ?start: apply
-?apply: subexpr | apply subexpr
+?apply: subexpr | mlambda | apply subexpr
 ?subexpr: var | "(" apply ")"
+mlambda: ("λ" | "\\") var* "." apply
 var: CNAME
 
 %import common.CNAME
