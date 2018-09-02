@@ -4,17 +4,11 @@ import lark
 
 def main(top):
     with (top / "grammar.lark").open() as f:
-        parser = lark.Lark(f.read())
+        parser = lark.Lark(f.read(), parser='lalr')
     testfiles = top / "testfiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
-        for line in tf.open():
-            line = line.strip()
-            if not line:
-                continue
-            print(f"==== {line}")
-            parse = parser.parse(line)
-            print(parse.pretty())
+        print(parser.parse(tf.read_text()).pretty())
 
 if __name__ == '__main__':
     import pathlib
