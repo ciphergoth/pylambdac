@@ -1,0 +1,8 @@
+start: expr
+expr: subexpr | expr subexpr
+subexpr: var
+var: CNAME
+
+%import common.CNAME
+%import common.WS
+%ignore WS

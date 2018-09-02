@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import lark
+
+def main():
+    with open("grammar.lark") as f:
+        l = lark.Lark(f.read())
+
+        print(l.parse("x"))
+        print(l.parse("x y"))
+        print(l.parse("x y z"))
+
+if __name__ == '__main__':
+    main()
