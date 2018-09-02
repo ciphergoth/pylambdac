@@ -1,6 +1,6 @@
-start: expr
-expr: subexpr | expr subexpr
-subexpr: var
+?start: apply
+?apply: subexpr | apply subexpr
+?subexpr: var
 var: CNAME
 
 %import common.CNAME

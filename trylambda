@@ -14,7 +14,7 @@ class Transformer(lark.Transformer):
         return lark.Tree('apply', [args[0], args[1]])
 
 def main():
-    transf = Transformer()
+    #transf = Transformer()
 
     with open("grammar.lark") as f:
         l = lark.Lark(f.read())
@@ -22,7 +22,7 @@ def main():
     for expr in ["x", "x y", "x y z"]:
         parse = l.parse(expr)
         print(parse.pretty())
-        print(transf.transform(parse).pretty())
+        #print(transf.transform(parse).pretty())
 
 if __name__ == '__main__':
     main()
