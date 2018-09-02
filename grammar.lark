@@ -1,6 +1,6 @@
 ?start: apply
 ?apply: subexpr | apply subexpr
-?subexpr: var
+?subexpr: var | "(" apply ")"
 var: CNAME
 
 %import common.CNAME

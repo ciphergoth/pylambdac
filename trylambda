@@ -19,7 +19,8 @@ def main():
     with open("grammar.lark") as f:
         l = lark.Lark(f.read())
 
-    for expr in ["x", "x y", "x y z"]:
+    for expr in ["x", "x y", "x y z", "x (y z)"]:
+        print(expr)
         parse = l.parse(expr)
         print(parse.pretty())
         #print(transf.transform(parse).pretty())
