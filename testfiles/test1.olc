@@ -2,6 +2,8 @@ let foo = (λx y. x x)(λz q1. z q1);
 let bar = (λx uuu. x x)(λee q1. ee q1);
 test foo == bar;
 
+# This bit is the good bit. (((
+
 let 0 = λa b c. a;
 let succ = λo a b c. b o;
 let 1 = succ 0;
