@@ -2,14 +2,18 @@
 
 import lark
 
-def main():
-    with open("grammar.lark") as f:
+def main(top):
+    with (top / "grammar.lark").open() as f:
         l = lark.Lark(f.read())
-
-    for expr in ["x", "x y", "x y z", "x (y z)", "λx y. y x"]:
-        print(expr)
-        parse = l.parse(expr)
+    print(l.parse("let x = x;").pretty())
+    for line in (top / "test1.olc").open():
+        line = line.strip()
+        if not line:
+            continue
+        print(f"==== {line}")
+        parse = l.parse(line)
         print(parse.pretty())
 
 if __name__ == '__main__':
-    main()
+    import pathlib
+    main(pathlib.Path(__file__).parent)

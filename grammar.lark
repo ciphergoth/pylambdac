@@ -1,9 +1,13 @@
-?start: apply
+start: directive ";"
+?directive: let | test
+let: "let" VAR "=" apply
+test: "test" apply "==" apply
 ?apply: subexpr | mlambda | apply subexpr
-?subexpr: var | "(" apply ")"
-mlambda: ("λ" | "\\") var* "." apply
-var: CNAME
+?subexpr: VAR | "(" apply ")"
+mlambda: ("λ" | "\\") VAR* "." apply
+VAR: ("_"|LETTER|DIGIT)+
 
-%import common.CNAME
+%import common.LETTER
+%import common.DIGIT
 %import common.WS
 %ignore WS
