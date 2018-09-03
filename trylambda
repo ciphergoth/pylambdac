@@ -4,13 +4,13 @@ import lark
 
 class Term:
     def __str__(self):
-        return self._str(False)
+        return self._str(False, False)
 
 class Var(Term):
     def __init__(self, name):
         self.name = name
 
-    def _str(self, insub):
+    def _str(self, bracketa, bracketl):
         return self.name
 
 class Apply(Term):
@@ -18,22 +18,20 @@ class Apply(Term):
         self.a = a
         self.b = b
 
-    def _str(self, insub):
-        if insub:
-            return f"({self._str(False)})"
-        else:
-            return f"{self.a._str(False)} {self.b._str(True)}"
+    def _str(self, bracketa, bracketl):
+        if bracketa:
+            return f"({self._str(False, False)})"
+        return f"{self.a._str(False, True)} {self.b._str(True, False)}"
 
 class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
         self.e = e
 
-    def _str(self, insub):
-        if insub:
-            return f"({self._str(False)})"
-        else:
-            return f"λ{self.v}.{self.e._str(False)}"
+    def _str(self, bracketa, bracketl):
+        if bracketl:
+            return f"({self._str(False, False)})"
+        return f"λ{self.v}.{self.e._str(False, False)}"
 
 @lark.v_args(inline=True)
 class Transformer(lark.Transformer):
