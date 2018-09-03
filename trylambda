@@ -2,19 +2,59 @@
 
 import lark
 
-class Var:
+class Term:
+    def __str__(self):
+        return self._str(False)
+
+class Var(Term):
     def __init__(self, name):
         self.name = name
 
-    def __str__(self):
-        return f"Var({self.name})"
+    def _str(self, insub):
+        return self.name
+
+class Apply(Term):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def _str(self, insub):
+        if insub:
+            return f"({self._str(False)})"
+        else:
+            return f"{self.a._str(False)} {self.b._str(True)}"
+
+class Lambda(Term):
+    def __init__(self, v, e):
+        self.v = v
+        self.e = e
+
+    def _str(self, insub):
+        if insub:
+            return f"({self._str(False)})"
+        else:
+            return f"λ{self.v}.{self.e._str(False)}"
 
 @lark.v_args(inline=True)
 class Transformer(lark.Transformer):
     def var(self, v):
-        print(f"---- {v} ----")
         return Var(v)
-        #return v
+
+    def apply(self, a, b):
+        return Apply(a, b)
+
+    def varlist(self, *args):
+        return args
+
+    def mlambda(self, vars, e):
+        res = e
+        for v in reversed(vars):
+            res = Lambda(v, res)
+        return res
+
+    #def mlambda(self, *args):
+    #    print(repr(args))
+
 
 def main(top):
     with (top / "grammar.lark").open() as f:
@@ -24,9 +64,9 @@ def main(top):
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
         parse = parser.parse(tf.read_text())
+        print(parse.pretty())
         parse = transf.transform(parse)
         print(parse.pretty())
-
 
 if __name__ == '__main__':
     import pathlib
