@@ -21,6 +21,12 @@ class Term:
     def __hash__(self):
         return hash(list(self.prefixcode()))
 
+    def reduce_once(self):
+        return None
+
+    def lambda_subst(self, expr):
+        return None
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -36,6 +42,12 @@ class Var(Term):
             yield "v"
             yield self.name
 
+    def var_subst(self, var, value):
+        if self.name == var:
+            return value
+        else:
+            return self
+
 class Apply(Term):
     def __init__(self, a, b):
         self.a = a
@@ -50,6 +62,18 @@ class Apply(Term):
         yield "a"
         yield from self.a._prefixcode(names)
         yield from self.b._prefixcode(names)
+
+    def reduce_once(self):
+        ls = self.a.lambda_subst(self.b)
+        if ls is not None:
+            return ls
+        ra = self.a.reduce_once()
+        if ra is not None:
+            return Apply(ra, b)
+        return None
+
+    def var_subst(self, var, value):
+        return Apply(self.a.var_subst(var, value), self.b.var_subst(var, value))
 
 class Lambda(Term):
     def __init__(self, v, e):
@@ -78,3 +102,11 @@ class Lambda(Term):
             print(names)
             yield from self.e._prefixcode(names)
             del names[0]
+
+    # FIXME: this is definitely incorrect. Will make correct
+    # once I have a failing test to catch the problem.
+    def lambda_subst(self, expr):
+        return self.e.var_subst(self.v, expr)
+
+    def var_subst(self, var, value):
+        return Lambda(self.v, self.e.var_subst(var, value))
