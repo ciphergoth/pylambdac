@@ -43,6 +43,28 @@ examples = [
             "λY1. foo (Y λf Y. foo f Y) Y1",
             "λd a a v foo a Y λd λd a a v foo d 1 d 0 d 0"
         ]
+    ],
+    [
+        [
+            "Y (λf x. x f) foo",
+            "a a v Y λd λd a d 0 d 1 v foo"
+        ],
+        [
+            "Y (λf x. x f) foo",
+            "a a Y λd λd a d 0 d 1 v foo"
+        ],
+        [
+            "(λf x. x f) (Y λf x. x f) foo",
+            "a a λd λd a d 0 d 1 a Y λd λd a d 0 d 1 v foo"
+        ],
+        [
+            "(λx. x (Y λf x. x f)) foo",
+            "a λd a d 0 a Y λd λd a d 0 d 1 v foo"
+        ],
+        [
+            "foo (Y λf x. x f)",
+            "a v foo a Y λd λd a d 0 d 1"
+        ]
     ]
 ]
 

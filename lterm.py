@@ -196,3 +196,7 @@ class MagicY(Term):
 
     def lambda_subst(self, expr):
         return Apply(expr, Apply(self, expr))
+
+    def var_subst(self, varsubst):
+        assert varsubst.var_subst(self) is self
+        return self
