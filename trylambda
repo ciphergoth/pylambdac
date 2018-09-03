@@ -10,6 +10,17 @@ expr_parser = lark.Lark(grammar, start='expr', parser='lalr')
 file_parser = lark.Lark(grammar, start='directives', parser='lalr')
 
 class Term:
+    def equiv(self, other):
+        if not isinstance(other, Term):
+            return False
+        return list(self._prefixcode([])) == list(other._prefixcode([]))
+
+    def _rolllambda(self, l):
+        return self
+
+    def prefixcode(self):
+        return self._prefixcode(None)
+
     def __str__(self):
         return self._str(False, False)
 
@@ -21,9 +32,6 @@ class Term:
     def __hash__(self):
         return hash(list(self.prefixcode()))
 
-    def _rolllambda(self, l):
-        return self
-
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -31,9 +39,13 @@ class Var(Term):
     def _str(self, bracketa, bracketl):
         return self.name
 
-    def prefixcode(self):
-        yield "v"
-        yield self.name
+    def _prefixcode(self, names):
+        if names is not None and self.name in names:
+            yield "d"
+            yield str(names.index(self.name))
+        else:
+            yield "v"
+            yield self.name
 
 class Apply(Term):
     def __init__(self, a, b):
@@ -45,10 +57,10 @@ class Apply(Term):
             return f"({self._str(False, False)})"
         return f"{self.a._str(False, True)} {self.b._str(True, bracketl)}"
 
-    def prefixcode(self):
+    def _prefixcode(self, names):
         yield "a"
-        yield from self.a.prefixcode()
-        yield from self.b.prefixcode()
+        yield from self.a._prefixcode(names)
+        yield from self.b._prefixcode(names)
 
 class Lambda(Term):
     def __init__(self, v, e):
@@ -66,26 +78,30 @@ class Lambda(Term):
         e = self._rolllambda(vars)
         return f"λ{' '.join(vars)}. {e._str(False, False)}"
 
-    def prefixcode(self):
-        yield "λ"
-        yield self.v
-        yield from self.e.prefixcode()
+    def _prefixcode(self, names):
+        if names is None:
+            yield "λ"
+            yield self.v
+            yield from self.e._prefixcode(None)
+        else:
+            yield "λd"
+            names.insert(0, self.v)
+            print(names)
+            yield from self.e._prefixcode(names)
+            del names[0]
 
 @lark.v_args(inline=True)
 class Transformer(lark.Transformer):
     def var(self, v):
-        return Var(v)
+        return Var(v.value)
 
     def apply(self, a, b):
         return Apply(a, b)
 
-    def varlist(self, *args):
-        return args
-
     def mlambda(self, vars, e):
         res = e
-        for v in reversed(vars):
-            res = Lambda(v, res)
+        for v in reversed(vars.children):
+            res = Lambda(v.value, res)
         return res
 
 transf = Transformer()
@@ -97,6 +113,7 @@ def checkexpr(expr):
     print(" ".join(expr.prefixcode()))
     print(" ".join(newexpr.prefixcode()))
     assert expr == newexpr
+    print(" ".join(expr._prefixcode([])))
     print("==============")
 
 def main():
@@ -113,6 +130,7 @@ def main():
             elif d.data == "test":
                 checkexpr(d.children[0])
                 checkexpr(d.children[1])
+                print("Equiv?", d.children[0].equiv(d.children[1]))
 
 if __name__ == '__main__':
     main()
