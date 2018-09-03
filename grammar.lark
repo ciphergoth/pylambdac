@@ -1,6 +1,6 @@
 start: (directive ";")*
 ?directive: let | test
-let: "let" var "=" apply
+let: "let" VARWORD "=" apply
 test: "test" apply "==" apply
 ?apply: subexpr  | apply subexpr
 ?subexpr: var | mlambda | "(" apply ")"
