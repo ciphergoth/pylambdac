@@ -27,6 +27,9 @@ class Term:
     def lambda_subst(self, expr):
         return None
 
+    def free_variables(self):
+        return set(self._free_variables())
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -47,6 +50,9 @@ class Var(Term):
             return value
         else:
             return self
+
+    def _free_variables(self):
+        yield self.name
 
 class Apply(Term):
     def __init__(self, a, b):
@@ -75,6 +81,10 @@ class Apply(Term):
     def var_subst(self, var, value):
         return Apply(self.a.var_subst(var, value), self.b.var_subst(var, value))
 
+    def _free_variables(self):
+        yield from self.a._free_variables()
+        yield from self.b._free_variables()
+
 class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
@@ -99,7 +109,6 @@ class Lambda(Term):
         else:
             yield "λd"
             names.insert(0, self.v)
-            print(names)
             yield from self.e._prefixcode(names)
             del names[0]
 
@@ -110,3 +119,8 @@ class Lambda(Term):
 
     def var_subst(self, var, value):
         return Lambda(self.v, self.e.var_subst(var, value))
+
+    def _free_variables(self):
+        for v in self.e._free_variables():
+            if v != self.v:
+                yield v
