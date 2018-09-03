@@ -158,12 +158,6 @@ class Lambda(Term):
             yield from self.e._prefixcode(names)
             del names[0]
 
-    def reduce_once(self):
-        ra = self.e.reduce_once()
-        if ra is not None:
-            return Lambda(self.v, ra)
-        return None
-
     def lambda_subst(self, expr):
         forbidden = self.e.variables(False)
         tosubst = VarSubst(self.v, expr, forbidden)
