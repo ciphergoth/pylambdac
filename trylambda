@@ -3,29 +3,32 @@
 import paths
 import parse
 
-def checkexpr(expr):
-    print("==============")
-    print(expr)
-    newexpr = parse.parse_expr(str(expr))
-    print(" ".join(expr.prefixcode()))
-    print(" ".join(newexpr.prefixcode()))
-    assert expr == newexpr
-    print(" ".join(expr._prefixcode([])))
-    print("==============")
+def verbose_reduce(expr, symbols):
+    while True:
+        print("    ", expr)
+        next = expr.reduce_once(symbols)
+        if next is None:
+            return expr
+        expr = next
 
 def main():
     testfiles = paths.top / "testfiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
+        symbols = {}
         directives = parse.parse_directives(tf.read_text())
         for d in directives.children:
-            print(d.pretty())
             if d.data == "let":
-                checkexpr(d.children[1])
+                name, value = d.children
+                symbols[name.value] = value
+                print(f"let {name.value}")
             elif d.data == "test":
-                checkexpr(d.children[0])
-                checkexpr(d.children[1])
-                print("Equiv?", d.children[0].equiv(d.children[1]))
+                left = verbose_reduce(d.children[0], symbols)
+                print()
+                right = verbose_reduce(d.children[1], symbols)
+                print()
+                print("Equiv?", left.equiv(right))
+                print()
 
 if __name__ == '__main__':
     main()
