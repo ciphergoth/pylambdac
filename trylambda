@@ -6,6 +6,9 @@ class Term:
     def __str__(self):
         return self._str(False, False)
 
+    def _rolllambda(self, l):
+        return self
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -28,10 +31,16 @@ class Lambda(Term):
         self.v = v
         self.e = e
 
+    def _rolllambda(self, vars):
+        vars.append(self.v)
+        return self.e._rolllambda(vars)
+
     def _str(self, bracketa, bracketl):
         if bracketl:
             return f"({self._str(False, False)})"
-        return f"λ{self.v}.{self.e._str(False, False)}"
+        vars = []
+        e = self._rolllambda(vars)
+        return f"λ{' '.join(vars)}. {e._str(False, False)}"
 
 @lark.v_args(inline=True)
 class Transformer(lark.Transformer):

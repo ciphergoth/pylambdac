@@ -5,7 +5,7 @@ test: "test" apply "==" apply
 ?apply: subexpr  | apply subexpr
 ?subexpr: var | mlambda | "(" apply ")"
 mlambda: ("λ" | "\\") varlist "." apply
-varlist: var*
+varlist: VARWORD*
 var: VARWORD
 VARWORD: ("_"|LETTER|DIGIT)+
 
