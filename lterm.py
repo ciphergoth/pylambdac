@@ -70,7 +70,7 @@ class Term:
     def __hash__(self):
         return hash(list(self.prefixcode()))
 
-    def reduce_once(self):
+    def reduce_once(self, syms):
         return None
 
     def lambda_subst(self, expr):
@@ -94,6 +94,11 @@ class Var(Term):
             yield "v"
             yield self.name
 
+    def reduce_once(self, syms):
+        # This is safe because it's only called for vars
+        # not under a lambda, so we don't have to worry about shadowing.
+        return syms.get(self.name, None)
+
     def var_subst(self, varsubst):
         return varsubst.var_subst(self)
 
@@ -115,13 +120,13 @@ class Apply(Term):
         yield from self.a._prefixcode(names)
         yield from self.b._prefixcode(names)
 
-    def reduce_once(self):
+    def reduce_once(self, syms):
         ls = self.a.lambda_subst(self.b)
         if ls is not None:
             return ls
-        ra = self.a.reduce_once()
+        ra = self.a.reduce_once(syms)
         if ra is not None:
-            return Apply(ra, b)
+            return Apply(ra, self.b)
         return None
 
     def var_subst(self, varsubst):

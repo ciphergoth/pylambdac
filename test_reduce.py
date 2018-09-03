@@ -37,10 +37,10 @@ def test_reduce():
         parsed = [parse.parse_expr(e) for e in example]
         state = parsed[0]
         print(f"Started with: {state}")
-        state = state.reduce_once()
+        state = state.reduce_once({})
         for next in parsed[1:]:
             print(f"Expected: {next}")
             print(f"Got: {state}")
             assert next.equiv(state)
-            state = state.reduce_once()
+            state = state.reduce_once({})
         assert state is None
