@@ -45,14 +45,3 @@ def test_reduce():
             assert next.equiv(state)
             state = state.reduce_once()
         assert state is None
-
-freevar_examples = [
-    ("x", {"x"}),
-    ("λx. x x", set()),
-    ("λx. y x", {"y"}),
-]
-
-def test_freevar():
-    for expr, res in freevar_examples:
-        expr = parse.parse_expr(expr)
-        assert res == expr.variables(True)
