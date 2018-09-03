@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import lterm
 import paths
 import parse
 
@@ -15,7 +16,7 @@ def main():
     testfiles = paths.top / "testfiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
-        symbols = {}
+        symbols = {"Y": lterm.MagicY("Y")}
         directives = parse.parse_directives(tf.read_text())
         for d in directives.children:
             if d.data == "let":

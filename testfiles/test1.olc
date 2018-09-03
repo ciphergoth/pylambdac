@@ -6,7 +6,6 @@ let 0 = λa b c. a;
 let succ = λo a b c. b o;
 let 1 = succ 0;
 let lim = λf a b c. c f;
-let Y = λ f. (λy. y y) (λ z. f (z z));
 let plusf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1);
 let plus = Y plusf;
 
