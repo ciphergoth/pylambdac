@@ -1,3 +1,52 @@
+import contextlib
+import re
+
+def findname(name, forbidden):
+    prefix = re.fullmatch(r"(.*\D)?(\d*)", name).group(1)
+    if prefix is None: prefix = "_"
+    i = 1
+    while True:
+        newname = f"{prefix}{i}"
+        if newname not in forbidden:
+            return newname
+        i += 1
+
+class VarSubst:
+    def __init__(self, var, expr, intarget):
+        self.var = var
+        self.expr = expr
+        freeinsource = expr.variables(True)
+        tosubst = freeinsource & intarget
+        forbidden = freeinsource | intarget
+        self.substplan = {}
+        for name in tosubst:
+            newname = findname(name, forbidden)
+            self.substplan[name] = newname
+            forbidden.add(newname)
+        # Use presence in subst to track shadowing
+        if self.var not in tosubst:
+            self.substplan[self.var] = self.var
+        self.subst = {}
+
+    @contextlib.contextmanager
+    def substitution(self, var):
+        if var not in self.substplan:
+            yield var
+        elif var in self.subst:
+            yield self.subst[var]
+        else:
+            self.subst[var] = self.substplan[var]
+            yield self.subst[var]
+            del self.subst[var]
+
+    def var_subst(self, var):
+        if var.name in self.subst:
+            return Var(self.subst[var.name])
+        elif var.name == self.var:
+            return self.expr
+        else:
+            return var
+
 class Term:
     def equiv(self, other):
         if not isinstance(other, Term):
@@ -27,8 +76,8 @@ class Term:
     def lambda_subst(self, expr):
         return None
 
-    def free_variables(self):
-        return set(self._free_variables())
+    def variables(self, free):
+        return set(self._variables(free))
 
 class Var(Term):
     def __init__(self, name):
@@ -45,13 +94,10 @@ class Var(Term):
             yield "v"
             yield self.name
 
-    def var_subst(self, var, value):
-        if self.name == var:
-            return value
-        else:
-            return self
+    def var_subst(self, varsubst):
+        return varsubst.var_subst(self)
 
-    def _free_variables(self):
+    def _variables(self, free):
         yield self.name
 
 class Apply(Term):
@@ -78,12 +124,12 @@ class Apply(Term):
             return Apply(ra, b)
         return None
 
-    def var_subst(self, var, value):
-        return Apply(self.a.var_subst(var, value), self.b.var_subst(var, value))
+    def var_subst(self, varsubst):
+        return Apply(self.a.var_subst(varsubst), self.b.var_subst(varsubst))
 
-    def _free_variables(self):
-        yield from self.a._free_variables()
-        yield from self.b._free_variables()
+    def _variables(self, free):
+        yield from self.a._variables(free)
+        yield from self.b._variables(free)
 
 class Lambda(Term):
     def __init__(self, v, e):
@@ -112,15 +158,26 @@ class Lambda(Term):
             yield from self.e._prefixcode(names)
             del names[0]
 
-    # FIXME: this is definitely incorrect. Will make correct
-    # once I have a failing test to catch the problem.
+    def reduce_once(self):
+        ra = self.e.reduce_once()
+        if ra is not None:
+            return Lambda(self.v, ra)
+        return None
+
     def lambda_subst(self, expr):
-        return self.e.var_subst(self.v, expr)
+        forbidden = self.e.variables(False)
+        tosubst = VarSubst(self.v, expr, forbidden)
+        return self.e.var_subst(tosubst)
 
-    def var_subst(self, var, value):
-        return Lambda(self.v, self.e.var_subst(var, value))
+    def var_subst(self, varsubst):
+        with varsubst.substitution(self.v) as newv:
+            return Lambda(newv, self.e.var_subst(varsubst))
 
-    def _free_variables(self):
-        for v in self.e._free_variables():
-            if v != self.v:
-                yield v
+    def _variables(self, free):
+        if free:
+            for v in self.e._variables(free):
+                if v != self.v:
+                    yield v
+        else:
+            yield self.v
+            yield from self.e._variables(free)
