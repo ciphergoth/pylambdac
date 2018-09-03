@@ -51,13 +51,13 @@ class Term:
     def equiv(self, other):
         if not isinstance(other, Term):
             return False
-        return list(self._prefixcode([])) == list(other._prefixcode([]))
+        return self.prefixcode() == other.prefixcode()
 
     def _rolllambda(self, l):
         return self
 
-    def prefixcode(self):
-        return self._prefixcode(None)
+    def prefixcode(self, *, debruijn=True):
+        return " ".join(self._prefixcode([] if debruijn else None))
 
     def __str__(self):
         return self._str(False, False)
@@ -65,10 +65,10 @@ class Term:
     def __eq__(self, other):
         if not isinstance(other, Term):
             return False
-        return list(self.prefixcode()) == list(other.prefixcode())
+        return self.prefixcode(False) == other.prefixcode(False)
 
     def __hash__(self):
-        return hash(list(self.prefixcode()))
+        return hash(self.prefixcode(False))
 
     def reduce_once(self, syms):
         return None
@@ -180,3 +180,19 @@ class Lambda(Term):
         else:
             yield self.v
             yield from self.e._variables(free)
+
+class MagicY(Term):
+    def __init__(self, name):
+        self.name = name
+
+    def _str(self, bracketa, bracketl):
+        return self.name
+
+    def _prefixcode(self, names):
+        yield "Y"
+
+    def _variables(self, free):
+        yield self.name
+
+    def lambda_subst(self, expr):
+        return Apply(expr, Apply(self, expr))
