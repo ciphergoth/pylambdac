@@ -1,10 +1,11 @@
-start: (directive ";")*
+directives: (directive ";")*
 ?directive: let | test
-let: "let" VARWORD "=" apply
-test: "test" apply "==" apply
-?apply: subexpr  | apply subexpr
-?subexpr: var | mlambda | "(" apply ")"
-mlambda: ("λ" | "\\") varlist "." apply
+let: "let" VARWORD "=" expr
+test: "test" expr "==" expr
+?expr: subexpr | apply
+apply: expr subexpr
+?subexpr: var | mlambda | "(" expr ")"
+mlambda: ("λ" | "\\") varlist "." expr
 varlist: VARWORD*
 var: VARWORD
 VARWORD: ("_"|LETTER|DIGIT)+

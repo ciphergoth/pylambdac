@@ -1,10 +1,25 @@
 #!/usr/bin/env python3
 
+import pathlib
+
 import lark
+
+top = pathlib.Path(__file__).parent
+grammar = (top / "grammar.lark").read_text()
+expr_parser = lark.Lark(grammar, start='expr', parser='lalr')
+file_parser = lark.Lark(grammar, start='directives', parser='lalr')
 
 class Term:
     def __str__(self):
         return self._str(False, False)
+
+    def __eq__(self, other):
+        if not isinstance(other, Term):
+            return False
+        return list(self.prefixcode()) == list(other.prefixcode())
+
+    def __hash__(self):
+        return hash(list(self.prefixcode()))
 
     def _rolllambda(self, l):
         return self
@@ -16,6 +31,10 @@ class Var(Term):
     def _str(self, bracketa, bracketl):
         return self.name
 
+    def prefixcode(self):
+        yield "v"
+        yield self.name
+
 class Apply(Term):
     def __init__(self, a, b):
         self.a = a
@@ -25,6 +44,11 @@ class Apply(Term):
         if bracketa:
             return f"({self._str(False, False)})"
         return f"{self.a._str(False, True)} {self.b._str(True, bracketl)}"
+
+    def prefixcode(self):
+        yield "a"
+        yield from self.a.prefixcode()
+        yield from self.b.prefixcode()
 
 class Lambda(Term):
     def __init__(self, v, e):
@@ -41,6 +65,11 @@ class Lambda(Term):
         vars = []
         e = self._rolllambda(vars)
         return f"λ{' '.join(vars)}. {e._str(False, False)}"
+
+    def prefixcode(self):
+        yield "λ"
+        yield self.v
+        yield from self.e.prefixcode()
 
 @lark.v_args(inline=True)
 class Transformer(lark.Transformer):
@@ -59,22 +88,31 @@ class Transformer(lark.Transformer):
             res = Lambda(v, res)
         return res
 
-    #def mlambda(self, *args):
-    #    print(repr(args))
+transf = Transformer()
 
+def checkexpr(expr):
+    print("==============")
+    print(expr)
+    newexpr = transf.transform(expr_parser.parse(str(expr)))
+    print(" ".join(expr.prefixcode()))
+    print(" ".join(newexpr.prefixcode()))
+    assert expr == newexpr
+    print("==============")
 
-def main(top):
-    with (top / "grammar.lark").open() as f:
-        parser = lark.Lark(f.read(), parser='lalr')
-    transf = Transformer()
+def main():
     testfiles = top / "testfiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
-        parse = parser.parse(tf.read_text())
-        print(parse.pretty())
+        parse = file_parser.parse(tf.read_text())
+        #print(parse.pretty())
         parse = transf.transform(parse)
-        print(parse.pretty())
+        for d in parse.children:
+            print(d.pretty())
+            if d.data == "let":
+                checkexpr(d.children[1])
+            elif d.data == "test":
+                checkexpr(d.children[0])
+                checkexpr(d.children[1])
 
 if __name__ == '__main__':
-    import pathlib
-    main(pathlib.Path(__file__).parent)
+    main()
