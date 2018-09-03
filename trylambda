@@ -24,7 +24,7 @@ class Apply(Term):
     def _str(self, bracketa, bracketl):
         if bracketa:
             return f"({self._str(False, False)})"
-        return f"{self.a._str(False, True)} {self.b._str(True, False)}"
+        return f"{self.a._str(False, True)} {self.b._str(True, bracketl)}"
 
 class Lambda(Term):
     def __init__(self, v, e):
