@@ -1,11 +1,12 @@
 start: (directive ";")*
 ?directive: let | test
-let: "let" VAR "=" apply
+let: "let" var "=" apply
 test: "test" apply "==" apply
 ?apply: subexpr | mlambda | apply subexpr
-?subexpr: VAR | "(" apply ")"
-mlambda: ("λ" | "\\") VAR* "." apply
-VAR: ("_"|LETTER|DIGIT)+
+?subexpr: var | "(" apply ")"
+mlambda: ("λ" | "\\") var* "." apply
+var: VARWORD
+VARWORD: ("_"|LETTER|DIGIT)+
 
 COMMENT: /#[^\n]*/
 %ignore WS

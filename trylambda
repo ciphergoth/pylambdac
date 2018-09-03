@@ -2,13 +2,31 @@
 
 import lark
 
+class Var:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f"Var({self.name})"
+
+@lark.v_args(inline=True)
+class Transformer(lark.Transformer):
+    def var(self, v):
+        print(f"---- {v} ----")
+        return Var(v)
+        #return v
+
 def main(top):
     with (top / "grammar.lark").open() as f:
         parser = lark.Lark(f.read(), parser='lalr')
+    transf = Transformer()
     testfiles = top / "testfiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
-        print(parser.parse(tf.read_text()).pretty())
+        parse = parser.parse(tf.read_text())
+        parse = transf.transform(parse)
+        print(parse.pretty())
+
 
 if __name__ == '__main__':
     import pathlib
