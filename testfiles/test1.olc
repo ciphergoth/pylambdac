@@ -2,24 +2,22 @@ let foo = (λx y. x x)(λz q1. z q1);
 let bar = (λx uuu. x x)(λee q1. ee q1);
 test foo == bar;
 
-# This bit is the good bit. (((
-
 let 0 = λa b c. a;
 let succ = λo a b c. b o;
 let 1 = succ 0;
 let lim = λf a b c. c f;
 let Y = λ f. (λy. y y) (λ z. f (z z));
-let plusf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim (λi. f (lf i) o1));
+let plusf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1);
 let plus = Y plusf;
 
 
 test plus 0 x == x;
 test (plusf (plusf (plusf plus))) (succ y) x == succ (plus y x);
 test plus 1 x == succ x;
-test plus (lim lf) x == lim (λi. plus (lf i) x);
+test plus (lim lf) x == lim λi. plus (lf i) x;
 
 
-let omega = lim (λi. i succ 0);
+let omega = lim λi. i succ 0;
 
 test omega == plus 0 omega;
 
