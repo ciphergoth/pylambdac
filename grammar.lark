@@ -1,7 +1,7 @@
 directives: (directive ";")*
-?directive: let | test
+?directive: let | reduce
 let: "let" VARWORD "=" expr
-test: "test" expr "==" expr
+reduce: "reduce" expr
 ?expr: subexpr | apply
 apply: expr subexpr
 ?subexpr: var | mlambda | "(" expr ")"

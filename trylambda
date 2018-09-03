@@ -22,13 +22,9 @@ def main():
             if d.data == "let":
                 name, value = d.children
                 symbols[name.value] = value
-                print(f"let {name.value}")
-            elif d.data == "test":
-                left = verbose_reduce(d.children[0], symbols)
-                print()
-                right = verbose_reduce(d.children[1], symbols)
-                print()
-                print("Equiv?", left.equiv(right))
+                print(f"let {name.value} {value}")
+            elif d.data == "reduce":
+                verbose_reduce(d.children[0], symbols)
                 print()
 
 if __name__ == '__main__':
