@@ -13,7 +13,7 @@ def verbose_reduce(expr, symbols):
         expr = next
 
 def main():
-    testfiles = paths.top / "testfiles"
+    testfiles = paths.top / "demofiles"
     for tf in testfiles.iterdir():
         print(f"==== {tf}")
         symbols = {"Y": lterm.MagicY("Y")}
