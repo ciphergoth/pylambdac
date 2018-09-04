@@ -8,11 +8,12 @@ let cadd = λa b f x. (a f) ((b f) x);
 let none = λnoneres somefunc. noneres;
 let some = λx noneres somefunc. somefunc x;
 let pair = λa b f. f a b;
-let nil = none;
-let cons = λh t. some (pair h t);
-let K = λx y. x;
 
-let foldrf = λrf f init l. l init λp. p λh t. f h (rf f init t);
+let nil = none;
+let cons = λh t nilres consfunc. consfunc h t;
+
+let K = λx y. x;
+let foldrf = λrf f init l. l init λh t. f h (rf f init t);
 let foldr = Y foldrf;
 
 let o0 = λa b c. a;
