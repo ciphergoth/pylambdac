@@ -21,8 +21,8 @@ let osucc = λo a b c. b o;
 let o1 = osucc o0;
 let o2 = osucc o1;
 let olim = λf a b c. c f;
-let oaddf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1);
-let oadd = Y addf;
+let oaddf = λf o2 o1. o2 o1 (λp. (osucc (f p o1))) (λ lf. olim λi. f (lf i) o1);
+let oadd = Y oaddf;
 let omega = olim λc. c osucc o0;
 
 let testsome = λx. x false (K true);
@@ -32,6 +32,11 @@ let tzero = λo. o (some o) (K none) (K none);
 let tsucc = λo. o none some (K none);
 let tlim = λc o. o none (K none) (λf. some (f c));
 
+reduce oadd omega o1;
+reduce oadd o1 omega;
+
 reduce testsome λ. foldr mm (some o0) [tzero];
 reduce testsome λ. foldr mm (some o1) [tzero tsucc];
 reduce testsome λ. foldr mm (some omega) [tzero tsucc tsucc (tlim c2)];
+reduce testsome λ. foldr mm (some (oadd omega o1)) [tzero tsucc tsucc tsucc (tlim c2)];
+reduce testsome λ. foldr mm (some (oadd o1 omega)) [tzero tsucc tsucc (tlim c2) tsucc];
