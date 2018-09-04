@@ -1,11 +1,33 @@
-let 0 = λa b c. a;
-let succ = λo a b c. b o;
-let 1 = succ 0;
-let 2 = succ 1;
-let lim = λf a b c. c f;
-let plusf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1);
-let plus = Y plusf;
+let c0 = λf x. x;
+let csucc = λn f x. f (n f x);
+let c1 = csucc c0;
+let c2 = csucc c1;
+let cadd = λa b f x. (a f) ((b f) x);
 
-let omega = lim λi. i succ 0;
+let none = λnoneres somefunc. noneres;
+let some = λx noneres somefunc. somefunc x;
+let pair = λa b f. f a b;
+let nil = none;
+let cons = λh t. some (pair h t);
+let K = λx y. x;
+#foldr :: (a -> b -> b) -> b -> [a] -> b
+# foldr f z []     = z
+# foldr f z (x:xs) = f x (foldr f z xs)
+let foldrf = λrf f init l. l init λp. p λh t. f h (rf f init t);
+let foldr = Y foldrf;
 
-reduce plus 2 2;
+let o0 = λa b c. a;
+let osucc = λo a b c. b o;
+let o1 = osucc o0;
+let o2 = osucc o1;
+let olim = λf a b c. c f;
+let oaddf = λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1);
+let oadd = Y addf;
+let omega = olim λc. c osucc o0;
+
+let testsome = λx. x false (K true);
+let testzero = λo. o (some o) (K none) (K none);
+let mm = λt mo. mo none t;
+
+#reduce testsome λ. mm testzero λ. some omega;
+reduce testsome λ. foldr mm (some o1) [testzero testzero];
