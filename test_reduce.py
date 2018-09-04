@@ -1,39 +1,9 @@
 import lterm
 import parse
-
-examples = [
-    [
-        "λx. x x",
-    ], [
-        "(λx y. y x) λz. z z",
-        "(λy. y (λz. z z))",
-    ], [
-        "(λx y. y x λx.x) λz. z z",
-        "λy. y (λz. z z) λx.x",
-    ],[
-        "(λx y. x) λz. z",
-        "λy. (λz. z)"
-    ], [
-        "(λx. x x) λz q1. z q1",
-        "(λz q1. z q1) λz q1. z q1",
-        "λq1. (λz q1. z q1) q1",
-    ], [
-        "(λx q q1 q2 q3 q4. x q2) q",
-        "λq5 q1 q2 q3 q4. q q2",
-    ], [
-        "((λx. (λq1. (λq4. (λq2. (λq3. (x q2)))))) q1)",
-        "(λq. (λq4. (λq2. (λq3. (q1 q2)))))",
-    ], [
-        "(λx q1 q. x) q",
-        "λq1 q2. q"
-    ], [
-        "(λr q. r q1) q",
-        "λq2. q q1"
-    ],
-]
+import tdata
 
 def test_reduce():
-    for example in examples:
+    for example in testfile.read():
         parsed = [parse.parse_expr(e) for e in example]
         state = parsed[0]
         print(f"Started with: {state}")
@@ -44,3 +14,18 @@ def test_reduce():
             assert next.equiv(state)
             state = state.reduce_once({})
         assert state is None
+
+class Tdata(tdata.Tdata):
+    def fixup(self, examples):
+        for example in examples:
+            new  = []
+            state = parse.parse_expr(example[0])
+            while state is not None:
+                new.append(str(state))
+                state = state.reduce_once({})
+            yield new
+
+testfile = Tdata("test_reduce")
+
+if __name__ == '__main__':
+    testfile.main()

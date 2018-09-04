@@ -10,12 +10,10 @@ def test_parse():
 
 class Tdata(tdata.Tdata):
     def fixup(self, examples):
-        res = []
         for example in examples:
             s = example[0]
             expr = parse.parse_expr(s)
-            res.append([s, expr.prefixcode(debruijn=False)])
-        return res
+            yield [s, expr.prefixcode(debruijn=False)]
 
 testfile = Tdata("test_parse")
 

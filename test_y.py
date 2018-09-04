@@ -17,7 +17,6 @@ def test_reduce():
 class Tdata(tdata.Tdata):
     def fixup(self, examples):
         symbols = {"Y": lterm.MagicY("Y")}
-        res = []
         for example in examples:
             new = []
             expr = parse.parse_expr(example[0][0])
@@ -26,8 +25,7 @@ class Tdata(tdata.Tdata):
                 expr = expr.reduce_once(symbols)
                 if expr is None:
                     break
-            res.append(new)
-        return res
+            yield new
 
 testfile = Tdata("test_y")
 

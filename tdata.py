@@ -7,21 +7,24 @@ import sys
 
 import paths
 
+def read_json(fn):
+    with fn.open() as f:
+        return json.load(f)
+
 class Tdata:
     def __init__(self, name):
         self.name = name
         self.file = paths.top / "testdata" / (name + ".json")
 
     def read(self):
-        with self.file.open() as f:
-            return json.load(f)
+        return read_json(self.file)
 
-    def fixup_file(self, source):
-        with source.open() as f:
-            examples = json.load(f)
-        examples = self.fixup(examples)
+    def write(self, examples):
         with self.file.open("w") as f:
             json.dump(examples, f, indent=4, ensure_ascii=False)
+
+    def fixup_file(self, source):
+        self.write(list(self.fixup(read_json(source))))
 
     def main(self):
         parser = argparse.ArgumentParser()
