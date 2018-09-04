@@ -1,0 +1,22 @@
+[
+    [
+        "λa b c. a",
+        "λ a λ b λ c v a"
+    ],
+    [
+        "λo a b c. b o",
+        "λ o λ a λ b λ c a v b v o"
+    ],
+    [
+        "λf a b c. c f",
+        "λ f λ a λ b λ c a v c v f"
+    ],
+    [
+        "λf o2 o1. o2 o1 (λp. (succ (f p o1))) (λ lf. lim λi. f (lf i) o1)",
+        "λ f λ o2 λ o1 a a a v o2 v o1 λ p a v succ a a v f v p v o1 λ lf a v lim λ i a a v f a v lf v i v o1"
+    ],
+    [
+        "(λx. x x) (λx. x x)",
+        "a λ x a v x v x λ x a v x v x"
+    ]
+]
