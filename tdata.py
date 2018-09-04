@@ -31,3 +31,12 @@ class Tdata:
         parser.add_argument("sourcefile", type=pathlib.Path)
         args = parser.parse_args()
         self.fixup_file(args.sourcefile)
+
+class CheckConsistent(Tdata):
+    def check_all(self):
+        for example in self.read():
+            assert example[1] == self.answer(example[0])
+
+    def fixup(self, examples):
+        for example in examples:
+            yield (example[0], self.answer(example[0]))
