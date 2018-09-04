@@ -2,6 +2,7 @@ let c0 = λf x. x;
 let csucc = λn f x. f (n f x);
 let c1 = csucc c0;
 let c2 = csucc c1;
+let c3 = csucc c2;
 let cadd = λa b f x. (a f) ((b f) x);
 
 let none = λnoneres somefunc. noneres;
@@ -10,9 +11,7 @@ let pair = λa b f. f a b;
 let nil = none;
 let cons = λh t. some (pair h t);
 let K = λx y. x;
-#foldr :: (a -> b -> b) -> b -> [a] -> b
-# foldr f z []     = z
-# foldr f z (x:xs) = f x (foldr f z xs)
+
 let foldrf = λrf f init l. l init λp. p λh t. f h (rf f init t);
 let foldr = Y foldrf;
 
@@ -26,8 +25,12 @@ let oadd = Y addf;
 let omega = olim λc. c osucc o0;
 
 let testsome = λx. x false (K true);
-let testzero = λo. o (some o) (K none) (K none);
 let mm = λt mo. mo none t;
 
-#reduce testsome λ. mm testzero λ. some omega;
-reduce testsome λ. foldr mm (some o1) [testzero testzero];
+let tzero = λo. o (some o) (K none) (K none);
+let tsucc = λo. o none some (K none);
+let tlim = λc o. o none (K none) (λf. some (f c));
+
+reduce testsome λ. foldr mm (some o0) [tzero];
+reduce testsome λ. foldr mm (some o1) [tzero tsucc];
+reduce testsome λ. foldr mm (some omega) [tzero tsucc tsucc (tlim c2)];
