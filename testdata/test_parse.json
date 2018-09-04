@@ -18,5 +18,9 @@
     [
         "(λx. x x) (λx. x x)",
         "a λ x a v x v x λ x a v x v x"
+    ],
+    [
+        "this [a b c] that",
+        "a a v this a a v cons v a a a v cons v b a a v cons v c v nil v that"
     ]
 ]

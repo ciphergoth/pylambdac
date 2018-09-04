@@ -2,9 +2,10 @@ directives: (directive ";")*
 ?directive: let | reduce
 let: "let" VARWORD "=" expr
 reduce: "reduce" expr
+list: "[" subexpr* "]"
 ?expr: subexpr | apply
 apply: expr subexpr
-?subexpr: var | mlambda | "(" expr ")"
+?subexpr: var | mlambda | "(" expr ")" | list
 mlambda: ("λ" | "\\") varlist "." expr
 varlist: VARWORD*
 var: VARWORD

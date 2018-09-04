@@ -21,6 +21,12 @@ class Transformer(lark.Transformer):
             res = lterm.Lambda(v.value, res)
         return res
 
+    def list(self, *args):
+        res = lterm.Var("nil")
+        for v in reversed(args):
+            res = lterm.Apply(lterm.Apply(lterm.Var("cons"), v), res)
+        return res
+
 transformer = Transformer()
 
 def parse_expr(expr):
