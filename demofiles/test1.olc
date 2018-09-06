@@ -1,3 +1,12 @@
+let K = λx y. x;
+
+# [a b c] parses to (cons a (cons b (cons c nil)))
+let nil = K;
+let cons = λh t nilres consfunc. consfunc h t;
+
+let foldrf = λrf f init l. l init λh t. f h (rf f init t);
+let foldr = Y foldrf;
+
 let c0 = λf x. x;
 let csucc = λn f x. f (n f x);
 let c1 = csucc c0;
@@ -5,25 +14,21 @@ let c2 = csucc c1;
 let c3 = csucc c2;
 let cadd = λa b f x. (a f) ((b f) x);
 
-let none = λnoneres somefunc. noneres;
-let some = λx noneres somefunc. somefunc x;
-let pair = λa b f. f a b;
-
-let nil = none;
-let cons = λh t nilres consfunc. consfunc h t;
-
-let K = λx y. x;
-let foldrf = λrf f init l. l init λh t. f h (rf f init t);
-let foldr = Y foldrf;
-
 let o0 = λa b c. a;
 let osucc = λo a b c. b o;
 let o1 = osucc o0;
 let o2 = osucc o1;
 let olim = λf a b c. c f;
-let oaddf = λf o2 o1. o2 o1 (λp. (osucc (f p o1))) (λ lf. olim λi. f (lf i) o1);
+
+let oaddf = λrf or ol. or ol (λp. (osucc (rf p ol))) (λ lf. olim λi. rf (lf i) ol);
 let oadd = Y oaddf;
+let omulf = λrf or ol. or o0 (λp. (oadd ol (rf p ol))) (λ lf. olim λi. rf (lf i) ol);
+let omul = Y omulf;
+
 let omega = olim λc. c osucc o0;
+
+let none = K;
+let some = λv n f. f v;
 
 let testsome = λx. x false (K true);
 let mm = λt mo. mo none t;
@@ -32,11 +37,15 @@ let tzero = λo. o (some o) (K none) (K none);
 let tsucc = λo. o none some (K none);
 let tlim = λc o. o none (K none) (λf. some (f c));
 
-reduce oadd omega o1;
-reduce oadd o1 omega;
+#reduce oadd omega o1;
+#reduce oadd o1 omega;
 
-reduce testsome λ. foldr mm (some o0) [tzero];
-reduce testsome λ. foldr mm (some o1) [tzero tsucc];
-reduce testsome λ. foldr mm (some omega) [tzero tsucc tsucc (tlim c2)];
-reduce testsome λ. foldr mm (some (oadd omega o1)) [tzero tsucc tsucc tsucc (tlim c2)];
-reduce testsome λ. foldr mm (some (oadd o1 omega)) [tzero tsucc tsucc (tlim c2) tsucc];
+#reduce testsome λ. foldr mm (some o0) [tzero];
+#reduce testsome λ. foldr mm (some o1) [tzero tsucc];
+#reduce testsome λ. foldr mm (some omega) [tzero tsucc tsucc (tlim c2)];
+#reduce testsome λ. foldr mm (some (oadd omega o1)) [tzero tsucc tsucc tsucc (tlim c2)];
+#reduce testsome λ. foldr mm (some (oadd o1 omega)) [tzero tsucc tsucc (tlim c2) tsucc];
+
+reduce testsome λ. foldr mm (some (omul o2 omega)) [tzero tsucc tsucc (tlim c2) tsucc tsucc (tlim c2)];
+#reduce testsome λ. foldr mm (some (omul o2 omega)) [ tsucc tsucc (tlim c2) tsucc tsucc (tlim c2)];
+#reduce (λo.o true (K false) (K false)) λ. oadd (c0 osucc o0) (omul o0 omega);
