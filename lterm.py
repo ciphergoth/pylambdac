@@ -60,7 +60,7 @@ class Term:
         return " ".join(self._prefixcode([] if debruijn else None))
 
     def __str__(self):
-        return self._str(False, False)
+        return "".join(self._str(False, False))
 
     def __eq__(self, other):
         if not isinstance(other, Term):
@@ -84,7 +84,7 @@ class Var(Term):
         self.name = name
 
     def _str(self, bracketa, bracketl):
-        return self.name
+        yield self.name
 
     def _prefixcode(self, names):
         if names is not None and self.name in names:
@@ -112,8 +112,13 @@ class Apply(Term):
 
     def _str(self, bracketa, bracketl):
         if bracketa:
-            return f"({self._str(False, False)})"
-        return f"{self.a._str(False, True)} {self.b._str(True, bracketl)}"
+            yield "("
+            yield from self._str(False, False)
+            yield ")"
+        else:
+            yield from self.a._str(False, True)
+            yield " "
+            yield from self.b._str(True, bracketl)
 
     def _prefixcode(self, names):
         yield "a"
@@ -147,10 +152,14 @@ class Lambda(Term):
 
     def _str(self, bracketa, bracketl):
         if bracketl:
-            return f"({self._str(False, False)})"
-        vars = []
-        e = self._rolllambda(vars)
-        return f"λ{' '.join(vars)}. {e._str(False, False)}"
+            yield "("
+            yield from self._str(False, False)
+            yield ")"
+        else:
+            vars = []
+            e = self._rolllambda(vars)
+            yield  f"λ{' '.join(vars)}. "
+            yield from e._str(False, False)
 
     def _prefixcode(self, names):
         if names is None:
@@ -186,7 +195,7 @@ class MagicY(Term):
         self.name = name
 
     def _str(self, bracketa, bracketl):
-        return self.name
+        yield self.name
 
     def _prefixcode(self, names):
         yield "Y"
