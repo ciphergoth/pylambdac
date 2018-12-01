@@ -22,7 +22,7 @@ def main():
             if d.data == "let":
                 name, value = d.children
                 symbols[name.value] = value
-                print(f"let {name.value} {value}")
+                print(f"let {name.value} = {value}")
             elif d.data == "reduce":
                 verbose_reduce(d.children[0], symbols)
                 print()
