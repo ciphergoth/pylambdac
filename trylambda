@@ -14,11 +14,6 @@ def verbose_reduce(expr, symbols):
             return expr
         expr = next
 
-def parse_args():
-    p = argparse.ArgumentParser(allow_abbrev=False)
-    p.add_argument("olcfile", nargs='*', type=pathlib.Path)
-    return p.parse_args()
-
 def try_file(tf):
     print(f"==== {tf}")
     symbols = {"Y": lterm.MagicY("Y")}
@@ -31,6 +26,11 @@ def try_file(tf):
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
+
+def parse_args():
+    p = argparse.ArgumentParser(allow_abbrev=False)
+    p.add_argument("olcfile", nargs='*', type=pathlib.Path)
+    return p.parse_args()
 
 def main():
     args = parse_args()
