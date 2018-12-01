@@ -2,7 +2,7 @@ import lterm
 import parse
 import tdata
 
-class Check(tdata.CheckConsistent):
+class Test(tdata.CheckConsistent):
     def answer(self, example):
         symbols = {"Y": lterm.MagicY("Y")}
         new = []
@@ -13,5 +13,3 @@ class Check(tdata.CheckConsistent):
             if expr is None:
                 break
         return new
-
-testinstance = Check("test_y")

@@ -1,7 +1,7 @@
 import parse
 import tdata
 
-class Check(tdata.CheckConsistent):
+class Test(tdata.CheckConsistent):
     def answer(self, example):
         new  = []
         state = parse.parse_expr(example)
@@ -9,5 +9,3 @@ class Check(tdata.CheckConsistent):
             new.append(str(state))
             state = state.reduce_once({})
         return new
-
-testinstance = Check("test_reduce")

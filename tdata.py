@@ -11,11 +11,12 @@ def read_json(fn):
     with fn.open() as f:
         return json.load(f)
 
-class Tdata:
+class Test:
     def __init__(self, name):
         self.name = name
-        self.file = paths.top / "testdata" / (name + ".json")
+        self.file = paths.top / "testdata" / (f"test_{name}.json")
 
+class Tdata(Test):
     def read(self):
         return read_json(self.file)
 
@@ -25,12 +26,6 @@ class Tdata:
 
     def fixup_file(self, source):
         self.write(list(self.fixup(read_json(source))))
-
-    def main(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument("sourcefile", type=pathlib.Path)
-        args = parser.parse_args()
-        self.fixup_file(args.sourcefile)
 
 class CheckConsistent(Tdata):
     def check_all(self):
