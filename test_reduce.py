@@ -1,4 +1,3 @@
-import lterm
 import parse
 import tdata
 
@@ -11,10 +10,4 @@ class Check(tdata.CheckConsistent):
             state = state.reduce_once({})
         return new
 
-testfile = Check("test_reduce")
-
-def test_reduce():
-    testfile.check_all()
-
-if __name__ == '__main__':
-    testfile.main()
+testinstance = Check("test_reduce")

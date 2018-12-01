@@ -1,4 +1,3 @@
-import lterm
 import parse
 
 examples = [
@@ -7,7 +6,10 @@ examples = [
     ("λx. y x", {"y"}),
 ]
 
-def test_freevar():
-    for expr, res in examples:
-        expr = parse.parse_expr(expr)
-        assert res == expr.variables(True)
+class Test:
+    def check_all(self):
+        for expr, res in examples:
+            expr = parse.parse_expr(expr)
+            assert res == expr.variables(True)
+
+testinstance = Test()

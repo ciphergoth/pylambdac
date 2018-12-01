@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+import all_tests
+
+def main():
+    for name, inst in all_tests.all_tests().items():
+        print(name)
+        inst.check_all()
+
+if __name__ == '__main__':
+    main()
