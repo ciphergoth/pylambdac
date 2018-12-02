@@ -73,7 +73,7 @@ class Term:
     def reduce_once(self, syms):
         return None
 
-    def lambda_subst(self, expr):
+    def lambda_subst(self, expr, syms):
         return None
 
     def variables(self, free):
@@ -126,7 +126,7 @@ class Apply(Term):
         yield from self.b._prefixcode(names)
 
     def reduce_once(self, syms):
-        ls = self.a.lambda_subst(self.b)
+        ls = self.a.lambda_subst(self.b, syms)
         if ls is not None:
             return ls
         ra = self.a.reduce_once(syms)
@@ -172,7 +172,7 @@ class Lambda(Term):
             yield from self.e._prefixcode(names)
             del names[0]
 
-    def lambda_subst(self, expr):
+    def lambda_subst(self, expr, syms):
         forbidden = self.e.variables(False)
         tosubst = VarSubst(self.v, expr, forbidden)
         return self.e.var_subst(tosubst)
@@ -213,9 +213,17 @@ class Magic(Term):
 
 class MagicY(Magic):
     pcode = 'Y'
-    def lambda_subst(self, expr):
+    def lambda_subst(self, expr, syms):
         return Apply(expr, Apply(self, expr))
 
+class MagicEager(Magic):
+    pcode = 'E'
+    def lambda_subst(self, expr, syms):
+        rd = expr.reduce_once(syms)
+        if rd is None:
+            return None
+        return Apply(self, rd)
+
 def get_magic(name, type):
-    m = {"Y": MagicY}
+    m = {"Y": MagicY, "eager": MagicEager}
     return m[type](name)

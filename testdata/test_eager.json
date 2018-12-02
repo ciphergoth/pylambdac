@@ -1,0 +1,28 @@
+[
+    [
+        "noneager ((λx. x x) foo)",
+        [
+            [
+                "noneager ((λx. x x) foo)",
+                ". ' noneager . λ^ . ^ 0 ^ 0 ' foo"
+            ]
+        ]
+    ],
+    [
+        "eager ((λx. x x) foo)",
+        [
+            [
+                "eager ((λx. x x) foo)",
+                ". ' eager . λ^ . ^ 0 ^ 0 ' foo"
+            ],
+            [
+                "eager ((λx. x x) foo)",
+                ". ^E . λ^ . ^ 0 ^ 0 ' foo"
+            ],
+            [
+                "eager (foo foo)",
+                ". ^E . ' foo ' foo"
+            ]
+        ]
+    ]
+]
