@@ -16,13 +16,17 @@ def verbose_reduce(expr, symbols):
 
 def try_file(tf):
     print(f"==== {tf}")
-    symbols = {"Y": lterm.MagicY("Y")}
+    symbols = {}
     directives = parse.parse_directives(tf.read_text())
     for d in directives.children:
         if d.data == "let":
             name, value = d.children
             symbols[name.value] = value
             print(f"let {name.value} = {value}")
+        elif d.data == "magic":
+            name, type = d.children
+            symbols[name.value] = lterm.get_magic(name.value, type.value)
+            print(f"magic {name.value} = {type.value}")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()

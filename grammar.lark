@@ -1,6 +1,7 @@
 directives: (directive ";")*
-?directive: let | reduce
+?directive: let | magic | reduce
 let: "let" VARWORD "=" expr
+magic: "magic" VARWORD VARWORD
 reduce: "reduce" expr
 
 ?expr: subexpr | apply

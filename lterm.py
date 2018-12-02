@@ -190,7 +190,7 @@ class Lambda(Term):
             yield self.v
             yield from self.e._variables(free)
 
-class MagicY(Term):
+class Magic(Term):
     def __init__(self, name):
         self.name = name
 
@@ -199,17 +199,23 @@ class MagicY(Term):
 
     def _prefixcode(self, names):
         if names is not None:
-            yield "^Y"
+            yield f"^{self.pcode}"
         else:
-            yield "'Y"
+            yield f"\'{self.pcode}"
             yield self.name
 
     def _variables(self, free):
         yield self.name
 
-    def lambda_subst(self, expr):
-        return Apply(expr, Apply(self, expr))
-
     def var_subst(self, varsubst):
         assert varsubst.var_subst(self) is self
         return self
+
+class MagicY(Magic):
+    pcode = 'Y'
+    def lambda_subst(self, expr):
+        return Apply(expr, Apply(self, expr))
+
+def get_magic(name, type):
+    m = {"Y": MagicY}
+    return m[type](name)
