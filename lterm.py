@@ -88,10 +88,10 @@ class Var(Term):
 
     def _prefixcode(self, names):
         if names is not None and self.name in names:
-            yield "d"
+            yield "^"
             yield str(names.index(self.name))
         else:
-            yield "v"
+            yield "\'"
             yield self.name
 
     def reduce_once(self, syms):
@@ -121,7 +121,7 @@ class Apply(Term):
             yield from self.b._str(True, bracketl)
 
     def _prefixcode(self, names):
-        yield "a"
+        yield "."
         yield from self.a._prefixcode(names)
         yield from self.b._prefixcode(names)
 
@@ -167,7 +167,7 @@ class Lambda(Term):
             yield self.v
             yield from self.e._prefixcode(None)
         else:
-            yield "λd"
+            yield "λ^"
             names.insert(0, self.v)
             yield from self.e._prefixcode(names)
             del names[0]
@@ -198,7 +198,11 @@ class MagicY(Term):
         yield self.name
 
     def _prefixcode(self, names):
-        yield "Y"
+        if names is not None:
+            yield "^Y"
+        else:
+            yield "'Y"
+            yield self.name
 
     def _variables(self, free):
         yield self.name

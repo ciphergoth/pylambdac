@@ -4,11 +4,11 @@
         [
             [
                 "Y",
-                "v Y"
+                "' Y"
             ],
             [
                 "Y",
-                "Y"
+                "^Y"
             ]
         ]
     ],
@@ -17,15 +17,15 @@
         [
             [
                 "Y x",
-                "a v Y v x"
+                ". ' Y ' x"
             ],
             [
                 "Y x",
-                "a Y v x"
+                ". ^Y ' x"
             ],
             [
                 "x (Y x)",
-                "a v x a Y v x"
+                ". ' x . ^Y ' x"
             ]
         ]
     ],
@@ -34,19 +34,19 @@
         [
             [
                 "Y λf Y. foo f Y",
-                "a v Y λd λd a a v foo d 1 d 0"
+                ". ' Y λ^ λ^ . . ' foo ^ 1 ^ 0"
             ],
             [
                 "Y λf Y. foo f Y",
-                "a Y λd λd a a v foo d 1 d 0"
+                ". ^Y λ^ λ^ . . ' foo ^ 1 ^ 0"
             ],
             [
                 "(λf Y. foo f Y) (Y λf Y. foo f Y)",
-                "a λd λd a a v foo d 1 d 0 a Y λd λd a a v foo d 1 d 0"
+                ". λ^ λ^ . . ' foo ^ 1 ^ 0 . ^Y λ^ λ^ . . ' foo ^ 1 ^ 0"
             ],
             [
                 "λY1. foo (Y λf Y. foo f Y) Y1",
-                "λd a a v foo a Y λd λd a a v foo d 1 d 0 d 0"
+                "λ^ . . ' foo . ^Y λ^ λ^ . . ' foo ^ 1 ^ 0 ^ 0"
             ]
         ]
     ],
@@ -55,23 +55,23 @@
         [
             [
                 "Y (λf x. x f) foo",
-                "a a v Y λd λd a d 0 d 1 v foo"
+                ". . ' Y λ^ λ^ . ^ 0 ^ 1 ' foo"
             ],
             [
                 "Y (λf x. x f) foo",
-                "a a Y λd λd a d 0 d 1 v foo"
+                ". . ^Y λ^ λ^ . ^ 0 ^ 1 ' foo"
             ],
             [
                 "(λf x. x f) (Y λf x. x f) foo",
-                "a a λd λd a d 0 d 1 a Y λd λd a d 0 d 1 v foo"
+                ". . λ^ λ^ . ^ 0 ^ 1 . ^Y λ^ λ^ . ^ 0 ^ 1 ' foo"
             ],
             [
                 "(λx. x (Y λf x. x f)) foo",
-                "a λd a d 0 a Y λd λd a d 0 d 1 v foo"
+                ". λ^ . ^ 0 . ^Y λ^ λ^ . ^ 0 ^ 1 ' foo"
             ],
             [
                 "foo (Y λf x. x f)",
-                "a v foo a Y λd λd a d 0 d 1"
+                ". ' foo . ^Y λ^ λ^ . ^ 0 ^ 1"
             ]
         ]
     ]
