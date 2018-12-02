@@ -8,7 +8,7 @@ class Test(tdata.CheckConsistent):
         new = []
         expr = parse.parse_expr(example)
         while True:
-            new.append([str(expr), expr.prefixcode()])
+            new.append([str(expr), expr.prefixcode(debruijn=True)])
             expr = expr.reduce_once(symbols)
             if expr is None:
                 break

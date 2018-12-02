@@ -51,12 +51,12 @@ class Term:
     def equiv(self, other):
         if not isinstance(other, Term):
             return False
-        return self.prefixcode() == other.prefixcode()
+        return self.prefixcode(debruijn=True) == other.prefixcode(debruijn=True)
 
     def _rolllambda(self, l):
         return self
 
-    def prefixcode(self, *, debruijn=True):
+    def prefixcode(self, *, debruijn):
         return " ".join(self._prefixcode([] if debruijn else None))
 
     def __str__(self):
@@ -65,10 +65,10 @@ class Term:
     def __eq__(self, other):
         if not isinstance(other, Term):
             return False
-        return self.prefixcode(False) == other.prefixcode(False)
+        return self.prefixcode(debruijn=False) == other.prefixcode(debruijn=False)
 
     def __hash__(self):
-        return hash(self.prefixcode(False))
+        return hash(self.prefixcode(debruijn=False))
 
     def reduce_once(self, syms):
         return None
