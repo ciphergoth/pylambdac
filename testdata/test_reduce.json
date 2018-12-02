@@ -61,5 +61,12 @@
             "(λr q. r q1) q",
             "λq2. q q1"
         ]
+    ],
+    [
+        "(λr. r freevar λfreevar. freevar) freevar",
+        [
+            "(λr. r freevar λfreevar. freevar) freevar",
+            "freevar freevar λfreevar1. freevar1"
+        ]
     ]
 ]
