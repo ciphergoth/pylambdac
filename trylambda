@@ -26,7 +26,7 @@ def try_file(tf):
         elif d.data == "magic":
             name, type = d.children
             symbols[name.value] = lterm.get_magic(name.value, type.value)
-            print(f"magic {name.value} = {type.value}")
+            print(f"magic {name.value} {type.value}")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
