@@ -1,0 +1,38 @@
+# let Y = λf. (λx. f (x x)) (λx. f (x x));
+magic Y Y;
+
+let c0 = λf x. x;
+let csucc = λn f x. f (n f x);
+let c1 = csucc c0;
+let c2 = csucc c1;
+let c3 = csucc c2;
+let c4 = csucc c3;
+
+let o0 = λa b c. a;
+let osucc = λo a b c. b o;
+let olim = λf a b c. c f;
+let o1 = osucc o0;
+let o2 = osucc o1;
+let o3 = osucc o2;
+
+let fgf = Y λrf o n. o (csucc n) (λp. n (rf p) n) (λlf. rf (lf n) n);
+
+let cfunc = λz s. Y λrf b. b z (λp. s (rf p)) (λlf. olim λn. rf (lf n));
+let oadd = λa. cfunc a osucc;
+let C = λf x y. f y x;
+let omul = λa. cfunc o0 (C oadd a);
+let opow = λa. cfunc o1 (C omul a);
+
+let omega = olim λn. n osucc o0;
+let wpow = λb. opow omega b;
+let fixedp = λf o. olim λn. n f o;
+let stepfix = λf. cfunc (f o0) (λp. f (osucc p));
+let deriv = λf. stepfix (fixedp f);
+let veblen2 = Y λrf beta. beta
+    wpow
+    (λp. deriv (rf p))
+    (λlf. stepfix (λs. olim λn. fixedp (lf n) s));
+let feferman_schuette = fixedp (C veblen2 o0);
+
+magic eager eager;
+reduce fgf (feferman_schuette o3) c3 eager term;
