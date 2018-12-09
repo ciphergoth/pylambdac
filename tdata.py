@@ -26,14 +26,16 @@ def read_json(fn):
 class Test:
     def __init__(self, name):
         self.name = name
-        self.file = paths.top / "testdata" / (f"test_{name}.json")
 
 class Tdata(Test):
+    def file(self):
+        return paths.top / "testdata" / (f"test_{self.name}.json")
+
     def read(self):
-        return read_json(self.file)
+        return read_json(self.file())
 
     def write(self, examples):
-        with self.file.open("w") as f:
+        with self.file().open("w") as f:
             json.dump(examples, f, indent=4, ensure_ascii=False)
 
     def fixup_file(self, source):
