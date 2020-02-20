@@ -35,16 +35,27 @@ class Apply(Lexp):
 
     def draw(self, grid, wo, ho, ll):
         self._l.draw(grid, wo, ho, ll)
+        for i in range((ho + self._l.size[1] -1) * 4 + 2, (ho + self.size[1] -1) * 4 + 3):
+            grid[i][wo * 4 + 2] = "#"
         self._r.draw(grid, wo + self._l.size[0], ho, ll)
-        for i in range(wo * 4 + 2, (wo + self.size[0] -1) * 4 + 3):
+        for i in range((ho + self._r.size[1] -1) * 4 + 2, (ho + self.size[1] -1) * 4 + 3):
+            grid[i][(wo + self._l.size[0]) * 4 + 2] = "#"
+        for i in range(wo * 4 + 2, (wo + self._l.size[0]) * 4 + 3):
             grid[(ho + self.size[1] -1) * 4 + 2][i] = "#"
 
 
-ex = Lambda(Apply(l=Var(0), r=Var(0)))
+def gex():
+    l = Lambda
+    a = Apply
+    v = Var
+    p = l(l(a(v(0), v(1))))
+    return a(p, p)
+
+ex = gex()
 w, h = ex.size
 
-grid = [[" " for _ in range(w * 4 + 5)] for _ in range(h * 4 + 5)]
-ex.draw(grid, 1, 1, [])
+grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 4 + 1)]
+ex.draw(grid, 0, 0, [])
 
 for l in grid:
     print("".join(l))
