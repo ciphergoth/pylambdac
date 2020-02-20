@@ -48,8 +48,7 @@ def gex():
     l = Lambda
     a = Apply
     v = Var
-    p = l(l(a(v(0), v(1))))
-    return a(p, p)
+    return l(a(l(a(v(0), v(0))), l(a(v(1), a(v(0), v(0))))))
 
 ex = gex()
 w, h = ex.size
