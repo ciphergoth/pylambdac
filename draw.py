@@ -2,18 +2,18 @@
 
 class Grid:
     def __init__(self, h, w):
-        self.grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 4 + 1)]
+        self.grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 3)]
 
     def drawh(self, r, cstart, cend):
         for i in range(cstart * 4 + 2, (cend -1) * 4 + 3):
-            self.grid[r * 4 + 2][i] = "#"
+            self.grid[r * 3 + 1][i] = "#"
 
     def drawl(self, r, cstart, cend):
         for i in range(cstart * 4 + 1, (cend -1) * 4 + 4):
-            self.grid[r * 4 + 2][i] = "#"
+            self.grid[r * 3 + 1][i] = "#"
 
     def drawv(self, rstart, rend, c):
-        for i in range(rstart * 4 + 2, (rend -1) * 4 + 3):
+        for i in range(rstart * 3 + 1, (rend -1) * 3 + 2):
             self.grid[i][c * 4 + 2] = "#"
 
     def print(self):
