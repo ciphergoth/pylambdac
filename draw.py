@@ -1,28 +1,46 @@
 #!/usr/bin/env python3
 
+class Grid:
+    def __init__(self, h, w):
+        self.grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 4 + 1)]
+
+    def drawh(self, r, cstart, cend):
+        for i in range(cstart * 4 + 2, (cend -1) * 4 + 3):
+            self.grid[r * 4 + 2][i] = "#"
+
+    def drawl(self, r, cstart, cend):
+        for i in range(cstart * 4 + 1, (cend -1) * 4 + 4):
+            self.grid[r * 4 + 2][i] = "#"
+
+    def drawv(self, rstart, rend, c):
+        for i in range(rstart * 4 + 2, (rend -1) * 4 + 3):
+            self.grid[i][c * 4 + 2] = "#"
+
+    def print(self):
+        for l in self.grid:
+            print("".join(l))
+
 class Lexp:
     pass
 
 class Var(Lexp):
     def __init__(self, d):
         self._d = d
-        self.size = (1, 0, 0, 0)
+        self.size = (0, 1, 0, 0)
 
-    def draw(self, grid, wo, ho, ll):
-        for i in range(ll[-(self._d + 1)] * 4 + 2, ho * 4 + 3):
-            grid[i][wo * 4 + 2] = "#"
+    def draw(self, grid, ro, co, ll):
+        grid.drawv(ll[-(self._d + 1)], ro + 1, co)
 
 class Lambda(Lexp):
     def __init__(self, e):
         self._e = e
         s = e.size
-        self.size = (s[0], s[1] + 1, s[2], s[3])
+        self.size = (s[0] + 1, s[1], s[2], s[3])
 
-    def draw(self, grid, wo, ho, ll):
-        for i in range(wo * 4 + 1, (wo + self.size[0] -1) * 4 + 4):
-            grid[ho * 4 + 2][i] = "#"
-        ll.append(ho)
-        self._e.draw(grid, wo, ho + 1, ll)
+    def draw(self, grid, ro, co, ll):
+        grid.drawl(ro, co, co + self.size[1])
+        ll.append(ro)
+        self._e.draw(grid, ro + 1, co, ll)
         ll.pop()
 
 class Apply(Lexp):
@@ -31,20 +49,14 @@ class Apply(Lexp):
         self._r = r
         ls = l.size
         rs = r.size
-        self.size = (ls[0] + rs[0], max(ls[1], rs[1]) + 1, ls[3], ls[0] + rs[2])
+        self.size = (max(ls[0], rs[0]) + 1, ls[1] + rs[1], ls[3], ls[1] + rs[2])
 
-    def draw(self, grid, wo, ho, ll):
-        self._l.draw(grid, wo, ho, ll)
-        self._r.draw(grid, wo + self._l.size[0], ho, ll)
-        l = (wo + self.size[2]) * 4 + 2
-        r = (wo + self.size[3]) * 4 + 2
-        for i in range((ho + self._l.size[1] -1) * 4 + 2, (ho + self.size[1] -1) * 4 + 3):
-            grid[i][l] = "#"
-        for i in range((ho + self._r.size[1] -1) * 4 + 2, (ho + self.size[1] -1) * 4 + 3):
-            grid[i][r] = "#"
-        for i in range(l, r + 1):
-            grid[(ho + self.size[1] -1) * 4 + 2][i] = "#"
-
+    def draw(self, grid, ro, co, ll):
+        self._l.draw(grid, ro, co, ll)
+        self._r.draw(grid, ro, co + self._l.size[1], ll)
+        grid.drawv(ro + self._l.size[0] -1, ro + self.size[0], co + self.size[2])
+        grid.drawh(ro + self.size[0] -1, co + self.size[2], co + self.size[3] + 1)
+        grid.drawv(ro + self._r.size[0] -1, ro + self.size[0], co + self.size[3])
 
 def gex():
     l = Lambda
@@ -53,11 +65,7 @@ def gex():
     return l(a(l(a(v(0), v(0))), l(a(v(1), a(v(0), v(0))))))
 
 ex = gex()
-w = ex.size[0]
-h = ex.size[1]
 
-grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 4 + 1)]
+grid = Grid(ex.size[0], ex.size[1])
 ex.draw(grid, 0, 0, [])
-
-for l in grid:
-    print("".join(l))
+grid.print()
