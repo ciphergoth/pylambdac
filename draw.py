@@ -5,15 +5,15 @@ class Grid:
         self.grid = [[" " for _ in range(w * 4 + 1)] for _ in range(h * 3)]
 
     def drawh(self, r, cstart, cend):
-        for i in range(cstart * 4 + 2, (cend -1) * 4 + 3):
+        for i in range(cstart * 4 + 2, cend * 4 + 3):
             self.grid[r * 3 + 1][i] = "#"
 
     def drawl(self, r, cstart, cend):
-        for i in range(cstart * 4 + 1, (cend -1) * 4 + 4):
+        for i in range(cstart * 4 + 1, cend * 4 + 4):
             self.grid[r * 3 + 1][i] = "#"
 
     def drawv(self, rstart, rend, c):
-        for i in range(rstart * 3 + 1, (rend -1) * 3 + 2):
+        for i in range(rstart * 3 + 1, rend * 3 + 2):
             self.grid[i][c * 4 + 2] = "#"
 
     def print(self):
@@ -29,7 +29,7 @@ class Var(Lexp):
         self.size = (0, 1, 0, 0)
 
     def draw(self, grid, ro, co, ll):
-        grid.drawv(ll[-(self._d + 1)], ro + 1, co)
+        grid.drawv(ll[-(self._d + 1)], ro, co)
 
 class Lambda(Lexp):
     def __init__(self, e):
@@ -38,7 +38,7 @@ class Lambda(Lexp):
         self.size = (s[0] + 1, s[1], s[2], s[3])
 
     def draw(self, grid, ro, co, ll):
-        grid.drawl(ro, co, co + self.size[1])
+        grid.drawl(ro, co, co + self.size[1] -1)
         ll.append(ro)
         self._e.draw(grid, ro + 1, co, ll)
         ll.pop()
@@ -54,9 +54,9 @@ class Apply(Lexp):
     def draw(self, grid, ro, co, ll):
         self._l.draw(grid, ro, co, ll)
         self._r.draw(grid, ro, co + self._l.size[1], ll)
-        grid.drawv(ro + self._l.size[0] -1, ro + self.size[0], co + self.size[2])
-        grid.drawh(ro + self.size[0] -1, co + self.size[2], co + self.size[3] + 1)
-        grid.drawv(ro + self._r.size[0] -1, ro + self.size[0], co + self.size[3])
+        grid.drawv(ro + self._l.size[0] -1, ro + self.size[0] -1, co + self.size[2])
+        grid.drawh(ro + self.size[0] -1, co + self.size[2], co + self.size[3])
+        grid.drawv(ro + self._r.size[0] -1, ro + self.size[0] -1, co + self.size[3])
 
 def gex():
     l = Lambda
