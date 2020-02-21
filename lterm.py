@@ -96,6 +96,7 @@ class Term:
 class Var(Term):
     def __init__(self, name):
         self.name = name
+        self.draw_dims = (0, 1, 0, 0)
 
     def _str(self, bracketa, bracketl):
         yield self.name
@@ -119,10 +120,17 @@ class Var(Term):
     def _variables(self, free):
         yield self.name
 
+    def draw(self, grid, ro, co, ll):
+        print(self, self.draw_dims)
+        grid.drawv(ll[self.name], ro, co)
+
 class Apply(Term):
     def __init__(self, a, b):
         self.a = a
         self.b = b
+        ls = a.draw_dims
+        rs = b.draw_dims
+        self.draw_dims = (max(ls[0], rs[0]) + 1, ls[1] + rs[1], ls[3], ls[1] + rs[2])
 
     def _str(self, bracketa, bracketl):
         if bracketa:
@@ -155,10 +163,21 @@ class Apply(Term):
         yield from self.a._variables(free)
         yield from self.b._variables(free)
 
+    def draw(self, grid, ro, co, ll):
+        print(self, self.draw_dims)
+        self.a.draw(grid, ro, co, ll)
+        self.b.draw(grid, ro, co + self.a.draw_dims[1], ll)
+        grid.drawv(ro + self.a.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[2])
+        grid.drawh(ro + self.draw_dims[0] -1, co + self.draw_dims[2], co + self.draw_dims[3])
+        grid.drawv(ro + self.b.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[3])
+
+
 class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
         self.e = e
+        s = e.draw_dims
+        self.draw_dims = (s[0] + 1, s[1], s[2], s[3])
 
     def _rolllambda(self, vars):
         vars.append(self.v)
@@ -203,6 +222,14 @@ class Lambda(Term):
         else:
             yield self.v
             yield from self.e._variables(free)
+
+    def draw(self, grid, ro, co, ll):
+        print(self, self.draw_dims)
+        grid.drawl(ro, co, co + self.draw_dims[1] -1)
+        old = ll.get(self.v, None)
+        ll[self.v] = ro
+        self.e.draw(grid, ro + 1, co, ll)
+        ll[self.v] = old
 
 class Magic(Term):
     def __init__(self, name):
