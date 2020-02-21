@@ -121,7 +121,6 @@ class Var(Term):
         yield self.name
 
     def draw(self, grid, ro, co, ll):
-        print(self, self.draw_dims)
         grid.drawv(ll[self.name], ro, co)
 
 class Apply(Term):
@@ -164,7 +163,6 @@ class Apply(Term):
         yield from self.b._variables(free)
 
     def draw(self, grid, ro, co, ll):
-        print(self, self.draw_dims)
         self.a.draw(grid, ro, co, ll)
         self.b.draw(grid, ro, co + self.a.draw_dims[1], ll)
         grid.drawv(ro + self.a.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[2])
@@ -224,7 +222,6 @@ class Lambda(Term):
             yield from self.e._variables(free)
 
     def draw(self, grid, ro, co, ll):
-        print(self, self.draw_dims)
         grid.drawl(ro, co, co + self.draw_dims[1] -1)
         old = ll.get(self.v, None)
         ll[self.v] = ro

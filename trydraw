@@ -3,7 +3,7 @@
 import draw
 import parse
 
-expr = parse.parse_expr("(λc2 c3.(λc4. c3 c4 (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) c4) (c2 c2)) (λf x. f (f x)) (λf x. f (f (f x)))")
+expr = parse.parse_expr("(λc3 c2. c3 (c2 c2) (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) (c2 c2)) (λf x. f (f (f x))) (λf x. f (f x))")
 
 grid = draw.draw_expr(expr)
 grid.print()
