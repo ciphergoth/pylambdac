@@ -10,6 +10,6 @@ preserve variable names and rename as appropriate during beta reduction.
 
 Dependencies:
 
-        pip install lark-parser
+        pip3 install lark-parser
 
 This is not an officially supported Google product.
