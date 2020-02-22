@@ -27,11 +27,11 @@ class Test(tdata.Test):
             freemap = {k:parse.parse_expr(v) for k, v in free.items()}
             parsed = [parse.parse_expr(e) for e in slist]
             state = parsed[0]
-            print(f"Started with: {state}")
+            #print(f"Started with: {state}")
             state = state.reduce_once(freemap)
             for next in parsed[1:]:
-                print(f"Expected: {next}")
-                print(f"Got: {state}")
+                #print(f"Expected: {next}")
+                #print(f"Got: {state}")
                 assert next.equiv(state)
                 state = state.reduce_once(freemap)
             assert state is None
