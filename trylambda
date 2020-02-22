@@ -69,6 +69,7 @@ def try_file(tf):
             grid = draw.draw_expr(expr)
             grid.print()
             print(f"{expr.size()} bits")
+            grid.writepbm("/tmp/out.pbm")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
