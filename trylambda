@@ -41,6 +41,13 @@ def flatten_symbols(expr, symbols):
         print(f"substituting {subst[0]} = {subst[1]}")
         expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
 
+def optimize(expr):
+    while True:
+        newexpr = expr.optimize()
+        if newexpr is None:
+            return expr
+        expr = newexpr
+
 def try_file(tf):
     print(f"==== {tf}")
     symbols = {}
@@ -58,6 +65,7 @@ def try_file(tf):
             print(f"magic {name.value} {type.value}")
         elif d.data == "draw":
             expr = flatten_symbols(d.children[0], symbols)
+            expr = optimize(expr)
             grid = draw.draw_expr(expr)
             grid.print()
             print(f"{expr.size()} bits")

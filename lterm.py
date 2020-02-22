@@ -118,6 +118,12 @@ class Term:
     def size(self):
         return self._size(SearchableStack())
 
+    def optimize(self):
+        return self._optimize(SearchableStack())
+
+    def _optimize(self, names):
+        return None
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -202,6 +208,19 @@ class Apply(Term):
     def _size(self, names):
         return 2 + self.a._size(names) + self.b._size(names)
 
+    def _optimize(self, names):
+        ls = self.a.lambda_subst(self.b, None)
+        if ls is not None:
+            if ls._size(names) < self._size(names):
+                return ls
+        na = self.a._optimize(names)
+        if na is not None:
+            return Apply(na, self.b)
+        nb = self.b._optimize(names)
+        if nb is not None:
+            return Apply(self.a, nb)
+        return None
+
 class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
@@ -263,6 +282,12 @@ class Lambda(Term):
         with names.add(self.v):
             return 2 + self.e._size(names)
 
+    def _optimize(self, names):
+        with names.add(self.v):
+            e = self.e._optimize(names)
+        if e:
+            return Lambda(self.v, e)
+        return None
 
 class Magic(Term):
     def __init__(self, name):
@@ -297,6 +322,8 @@ class MagicY(Magic):
 class MagicEager(Magic):
     pcode = 'E'
     def lambda_subst(self, expr, syms):
+        if syms is None:
+            return None
         rd = expr.reduce_once(syms)
         if rd is None:
             return None
