@@ -13,3 +13,7 @@ draw (λc3 c2. c3 (c2 c2) (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) (c
 
 # Bigger number in fewer bits - 83 bits
 # draw (λc2. (λg. g (g (g (g c2)))) (λn. n (λf b. b f (λx. x)) (λb. b c2) c2)) (λf x. f (f x))
+
+let c2 = λf x. f (f x);
+let c4 = c2 c2;
+draw c4;

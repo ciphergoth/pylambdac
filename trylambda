@@ -28,6 +28,19 @@ def verbose_reduce(expr, symbols):
             return expr
         expr = next
 
+def flatten_symbols(expr, symbols):
+    while True:
+        free = expr.variables(True)
+        if not free:
+            print(f"flat: {expr}")
+            return expr
+        print(f"flattening {expr}")
+        for p in symbols.items():
+            if p[0] in free:
+                subst = p
+        print(f"substituting {subst[0]} = {subst[1]}")
+        expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
+
 def measure_size(expr):
     score = 0
     for t in expr._prefixcode([]):
@@ -46,16 +59,19 @@ def try_file(tf):
     for d in directives.children:
         if d.data == "let":
             name, value = d.children
+            assert name.value not in symbols
             symbols[name.value] = value
             print(f"let {name.value} = {value}")
         elif d.data == "magic":
             name, type = d.children
+            assert name.value not in symbols
             symbols[name.value] = lterm.get_magic(name.value, type.value)
             print(f"magic {name.value} {type.value}")
         elif d.data == "draw":
-            grid = draw.draw_expr(d.children[0])
+            expr = flatten_symbols(d.children[0], symbols)
+            grid = draw.draw_expr(expr)
             grid.print()
-            print(f"{measure_size(d.children[0])} bits")
+            print(f"{measure_size(expr)} bits")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
