@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# let Y = λf. (λx. f (x x)) (λx. f (x x));
-magic Y Y;
+let Y = λf. (λx. f (x x)) (λx. f (x x));
+# magic Y Y;
 
+# https://johncarlosbaez.wordpress.com/2016/07/07/large-countable-ordinals-part-3/
+
+# Church integers
 let c0 = λf x. x;
+let c1 = λx. x;
+let c2 = λf x. f (f x);
+let c3 = λf x. f (f (f x));
+let c4 = λf x. f (f (f (f x)));
 let csucc = λn f x. f (n f x);
-let c1 = csucc c0;
-let c2 = csucc c1;
-let c3 = csucc c2;
-let c4 = csucc c3;
 
+# ordinals
 let o0 = λa b c. a;
 let osucc = λo a b c. b o;
 let olim = λf a b c. c f;
@@ -29,24 +33,61 @@ let o1 = osucc o0;
 let o2 = osucc o1;
 let o3 = osucc o2;
 
+# fast-growing function
+# fgf: o -> church -> church
 let fgf = Y λrf o n. o (csucc n) (λp. n (rf p) n) (λlf. rf (lf n) n);
 
+# define a continuous function
+# given f(0) and a way to compute f(a + 1) from f(a)
+# cfunc: o -> (o -> o) -> (o -> o)
 let cfunc = λz s. Y λrf b. b z (λp. s (rf p)) (λlf. olim λn. rf (lf n));
+
+# oadd: o -> o -> o
+# a + 0 = a, a + (b + 1) = (a + b) + 1
 let oadd = λa. cfunc a osucc;
+
+# C combinator, swap arguments to function
 let C = λf x y. f y x;
+
+# omul: o -> o -> o
+# a * 0 = 0, a * (b + 1) = (a * b) + a
 let omul = λa. cfunc o0 (C oadd a);
+
+# opow: o -> o -> o
+# a^0 = 1, a^{b + 1} = a^b * a
 let opow = λa. cfunc o1 (C omul a);
 
+# ordinal omega
 let omega = olim λn. n osucc o0;
-let wpow = λb. opow omega b;
+
+# First fixed point of f >= o where f strictly increasing, continuous
+# fixedp: (o -> o) -> o -> o
 let fixedp = λf o. olim λn. n f o;
+
+# stepfix (fixedp f) a = a'th fixed point of f, where a is an ordinal
+# stepfix: (o -> o) -> o -> o
+# stepfix f o0 = f o0
+# stepfix f (osucc a) = f (osucc (stepfix f a))
 let stepfix = λf. cfunc (f o0) (λp. f (osucc p));
+
+# Derivative of f, enumerates solutions of x = f x
+# deriv: (o -> o) -> (o -> o)
 let deriv = λf. stepfix (fixedp f);
+
+# Two-argument Veblen function
+# veblen2: o -> o -> o
+# veblen2 o0 a = opow omega a
+# veblen2 (osucc b) a = deriv (veblen2 b) a
+# veblen2 (olim lf) = stepfix (λs. olim λn. fixedp (lf n) s)
 let veblen2 = Y λrf beta. beta
-    wpow
+    (opow omega)
     (λp. deriv (rf p))
     (λlf. stepfix (λs. olim λn. fixedp (lf n) s));
-let feferman_schuette = fixedp (C veblen2 o0);
 
-magic eager eager;
-reduce fgf (feferman_schuette o3) c3 eager term;
+# Enumerate solutions of x = veblen2 x o0
+let feferman_schuette = deriv (C veblen2 o0);
+# Finally, make a really big number out of all this :)
+let bignum = fgf (osucc (feferman_schuette omega)) c3;
+draw bignum;
+#magic eager eager;
+#reduce bignum eager term;
