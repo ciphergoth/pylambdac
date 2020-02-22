@@ -81,12 +81,11 @@ def try_file(tf, args):
             print(f"flattened: {expr}")
             expr = optimize(expr)
             print(f"optimized: {expr}")
-            grid = draw.draw_expr(expr)
-            grid.print()
+            draw.draw_expr(3, expr).print()
             print(f"{expr.size()} bits")
             args.outdir.mkdir(parents=True, exist_ok=True)
             global drawing_counter
-            grid.write_image(args.outdir / f"l_{drawing_counter}.png")
+            draw.draw_expr(4, expr).write_image(args.outdir / f"l_{drawing_counter}.png")
             drawing_counter += 1
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)

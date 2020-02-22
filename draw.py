@@ -26,17 +26,18 @@ class Grid:
             (c * 4 + 1, rend * self.rstep)), 0)
 
     def print(self):
-        print("lol not printing")
+        for r in range(self.image.height):
+            print("".join("# "[self.image.getpixel((c, r))] for c in range(self.image.width)))
 
     def write_image(self, outfile, factor=10):
         image = PIL.ImageOps.expand(self.image, border=1, fill=1)
         image = PIL.ImageOps.scale(image, factor, resample=PIL.Image.NEAREST)
         image.save(outfile)
 
-def draw_expr(expr):
+def draw_expr(rstep, expr):
     h, w = expr.draw_dims[0:2]
     if w == 1:
         h += 1
-    grid = Grid(4, h, w)
+    grid = Grid(rstep, h, w)
     expr.draw(grid, 0, 0, {})
     return grid
