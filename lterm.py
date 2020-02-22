@@ -209,16 +209,16 @@ class Apply(Term):
         return 2 + self.a._size(names) + self.b._size(names)
 
     def _optimize(self, names):
-        ls = self.a.lambda_subst(self.b, None)
-        if ls is not None:
-            if ls._size(names) < self._size(names):
-                return ls
         na = self.a._optimize(names)
         if na is not None:
             return Apply(na, self.b)
         nb = self.b._optimize(names)
         if nb is not None:
             return Apply(self.a, nb)
+        ls = self.a.lambda_subst(self.b, None)
+        if ls is not None:
+            if ls._size(names) < self._size(names):
+                return ls
         return None
 
 class Lambda(Term):
