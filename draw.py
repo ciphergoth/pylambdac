@@ -18,7 +18,7 @@ class Grid:
         for l in self.grid:
             print("".join(l))
 
-def draw_expr(ex):
-    grid = Grid(ex.draw_dims[0], ex.draw_dims[1])
-    ex.draw(grid, 0, 0, {})
+def draw_expr(expr):
+    grid = Grid(expr.draw_dims[0], expr.draw_dims[1])
+    expr.draw(grid, 0, 0, {})
     return grid

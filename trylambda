@@ -16,6 +16,7 @@
 import argparse
 import pathlib
 
+import draw
 import lterm
 import parse
 
@@ -26,6 +27,17 @@ def verbose_reduce(expr, symbols):
         if next is None:
             return expr
         expr = next
+
+def measure_size(expr):
+    score = 0
+    for t in expr._prefixcode([]):
+        if t == "." or t == "λ^":
+            score += 2
+        elif t == "^":
+            pass
+        else:
+            score += 2 + int(t)
+    return score
 
 def try_file(tf):
     print(f"==== {tf}")
@@ -40,6 +52,10 @@ def try_file(tf):
             name, type = d.children
             symbols[name.value] = lterm.get_magic(name.value, type.value)
             print(f"magic {name.value} {type.value}")
+        elif d.data == "draw":
+            grid = draw.draw_expr(d.children[0])
+            grid.print()
+            print(f"{measure_size(d.children[0])} bits")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
