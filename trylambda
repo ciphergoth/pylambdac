@@ -20,6 +20,8 @@ import draw
 import lterm
 import parse
 
+TOPDIR=pathlib.path(__file__).resolve().parent
+
 def verbose_reduce(expr, symbols):
     while True:
         print("    ", expr)
@@ -48,7 +50,7 @@ def optimize(expr):
             return expr
         expr = newexpr
 
-def try_file(tf):
+def try_file(tf, args):
     print(f"==== {tf}")
     symbols = {}
     directives = parse.parse_directives(tf.read_text())
@@ -76,13 +78,14 @@ def try_file(tf):
 
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
+    p.add_argument("--outdir", type=pathlib.Path, default=TOPDIR / "out")
     p.add_argument("olcfile", nargs='*', type=pathlib.Path)
     return p.parse_args()
 
 def main():
     args = parse_args()
     for tf in args.olcfile:
-        try_file(tf)
+        try_file(tf, args)
 
 if __name__ == '__main__':
     main()
