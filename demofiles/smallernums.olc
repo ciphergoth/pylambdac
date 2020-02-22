@@ -10,7 +10,7 @@ let c5 = λf x. f (f (f (f (f x))));
 draw c5;
 let times = λa b f. a (b f);
 draw times;
-let c10 = times c5 c2;
+let c10 = times c2 c5;
 draw c10;
 let c100 = c2 c10;
 draw c100;
