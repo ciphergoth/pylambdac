@@ -1,0 +1,20 @@
+# lev0: an integer
+let c4 = λf x. f (f (f (f x)));
+
+# lev1: lev0 -> lev0
+# f_0 is successor function
+#let f0 = λn f x. n f (f x);
+
+# Save bits by using a smaller f_0 function
+let f0 = λn. n n;
+
+# lev2: lev1 -> lev1 = lev1 -> lev0 -> lev0
+let fsucc = λf n. n f n;
+
+# lev3: lev2 -> lev2 = lev2 -> lev1 -> lev0 -> lev0
+let fxomega = λf2 f1 n. n f2 f1 n;
+
+# lev4: lev3 -> lev3 = lev3 -> lev2 -> lev1 -> lev0 -> lev0
+let fpowomega = λf3 f2 f1 n. n f3 f2 f1 n;
+
+draw fsucc (fpowomega fxomega fsucc f0) c4;
