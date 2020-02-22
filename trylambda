@@ -57,11 +57,12 @@ def optimize(expr):
             return expr
         expr = newexpr
 
+drawing_counter = 1
+
 def try_file(tf, args):
     print(f"==== {tf}")
     symbols = {}
     directives = parse.parse_directives(tf.read_text())
-    drawing_counter = 1
     for d in directives.children:
         if d.data == "let":
             name, value = d.children
@@ -84,7 +85,8 @@ def try_file(tf, args):
             grid.print()
             print(f"{expr.size()} bits")
             args.outdir.mkdir(parents=True, exist_ok=True)
-            grid.writepbm(args.outdir / f"l_{drawing_counter}.pbm")
+            global drawing_counter
+            grid.write_image(args.outdir / f"l_{drawing_counter}.png")
             drawing_counter += 1
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)

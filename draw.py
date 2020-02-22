@@ -1,46 +1,42 @@
+import PIL.Image
+import PIL.ImageDraw
+import PIL.ImageOps
+
 class Grid:
-    def __init__(self, h, w):
+    def __init__(self, rstep, h, w):
+        self.rstep = rstep
         self.h = h
         self.w = w
-        self.grid = [[0 for _ in range(w * 4 + 1)] for _ in range(h * 2 - 1)]
+        self.image = PIL.Image.new("1", (w * 4 - 1, (h - 1) * rstep + 1), 1)
+        self.draw = PIL.ImageDraw.Draw(self.image)
 
     def drawh(self, r, cstart, cend):
-        for i in range(cstart * 4 + 2, cend * 4 + 3):
-            self.grid[r * 2][i] = 1
+        self.draw.rectangle(
+            ((cstart * 4 + 1, r * self.rstep),
+            (cend * 4 + 1, r * self.rstep)), 0)
 
     def drawl(self, r, cstart, cend):
-         for i in range(cstart * 4 + 1, cend * 4 + 4):
-            self.grid[r * 2][i] = 1
+        self.draw.rectangle(
+            ((cstart * 4, r * self.rstep),
+            (cend * 4 + 2, r * self.rstep)), 0)
 
     def drawv(self, rstart, rend, c):
-        for i in range(rstart * 2, rend * 2 + 1):
-            self.grid[i][c * 4 + 2] = 1
-
-    def yield_lines(self, rstep):
-        yield [0 for _ in range(self.w * 4 + 1)]
-        for i, l in enumerate(self.grid):
-            for _ in range(1 + (rstep -2) * (i % 2)):
-                yield l
-        yield [0 for _ in range(self.w * 4 + 1)]
+        self.draw.rectangle(
+            ((c * 4 + 1, rstart * self.rstep),
+            (c * 4 + 1, rend * self.rstep)), 0)
 
     def print(self):
-        for l in self.yield_lines(3):
-            print("".join(" #"[x] for x in l))
+        print("lol not printing")
 
-    def writepbm(self, outfile, pbmscale=10):
-        rstep = 4
-        with outfile.open("w") as f:
-            f.write(f"P1\n")
-            f.write(f"{pbmscale * (self.w * 4 + 1)} {pbmscale * (self.h * rstep -1)}\n")
-            for l in self.yield_lines(rstep):
-                for _ in range(pbmscale):
-                    f.write(" ".join("01"[x] for x in l for _ in range(pbmscale)))
-                    f.write("\n")
+    def write_image(self, outfile, factor=10):
+        image = PIL.ImageOps.expand(self.image, border=1, fill=1)
+        image = PIL.ImageOps.scale(image, factor, resample=PIL.Image.NEAREST)
+        image.save(outfile)
 
 def draw_expr(expr):
     h, w = expr.draw_dims[0:2]
     if w == 1:
         h += 1
-    grid = Grid(h, w)
+    grid = Grid(4, h, w)
     expr.draw(grid, 0, 0, {})
     return grid
