@@ -32,13 +32,13 @@ def flatten_symbols(expr, symbols):
     while True:
         free = expr.variables(True)
         if not free:
-            print(f"flat: {expr}")
+            #print(f"flat: {expr}")
             return expr
-        print(f"flattening {expr}")
+        #print(f"flattening {expr}")
         for p in symbols.items():
             if p[0] in free:
                 subst = p
-        print(f"substituting {subst[0]} = {subst[1]}")
+        #print(f"substituting {subst[0]} = {subst[1]}")
         expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
 
 def optimize(expr):
