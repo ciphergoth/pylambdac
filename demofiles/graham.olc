@@ -21,7 +21,7 @@ let grahamf = λn. uparrow n c3 c3;
 let graham = c64 grahamf c4;
 draw graham;
 
-draw (λc3 c2. c3 (c2 c2) (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) (c2 c2)) (λf x. f (f (f x))) (λf x. f (f x));
+# draw (λc3 c2. c3 (c2 c2) (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) (c2 c2)) (λf x. f (f (f x))) (λf x. f (f x));
 
 # Bigger number in fewer bits - 83 bits
 # draw (λc2. (λg. g (g (g (g c2)))) (λn. n (λf b. b f (λx. x)) (λb. b c2) c2)) (λf x. f (f x))
