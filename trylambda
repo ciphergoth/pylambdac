@@ -20,8 +20,6 @@ import draw
 import lterm
 import parse
 
-TOPDIR=pathlib.Path(__file__).resolve().parent
-
 def verbose_reduce(expr, symbols):
     while True:
         print("    ", expr)
@@ -82,15 +80,16 @@ def try_file(tf, args):
             print(f"optimized: {expr}")
             draw.draw_expr(3, expr).print()
             print(f"{expr.size()} bits")
-            args.outdir.mkdir(parents=True, exist_ok=True)
-            draw.draw_expr(4, expr).write_image(args.outdir / f"{name}.png")
+            if args.outdir:
+                args.outdir.mkdir(parents=True, exist_ok=True)
+                draw.draw_expr(4, expr).write_image(args.outdir / f"{name}.png")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
 
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
-    p.add_argument("--outdir", type=pathlib.Path, default=TOPDIR / "out")
+    p.add_argument("--outdir", type=pathlib.Path)
     p.add_argument("olcfile", nargs='*', type=pathlib.Path)
     return p.parse_args()
 
