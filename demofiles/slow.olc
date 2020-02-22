@@ -25,7 +25,7 @@ let c3 = λf x. f (f (f x));
 let c4 = λf x. f (f (f (f x)));
 let csucc = λn f x. f (n f x);
 
-# ordinals
+# ordinals with limit sequences
 let o0 = λa b c. a;
 let osucc = λo a b c. b o;
 let olim = λf a b c. c f;
@@ -87,7 +87,7 @@ let veblen2 = Y λrf beta. beta
 # Enumerate solutions of x = veblen2 x o0
 let feferman_schuette = deriv (C veblen2 o0);
 # Finally, make a really big number out of all this :)
-let bignum = fgf (osucc (feferman_schuette omega)) c3;
-draw bignum;
+let f_FS = fgf (osucc (feferman_schuette omega)) c3;
+draw f_FS;
 #magic eager eager;
-#reduce bignum eager term;
+#reduce f_FS eager term;

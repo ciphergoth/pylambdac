@@ -17,7 +17,7 @@ directives: (directive ";")*
 let: "let" VARWORD "=" expr
 magic: "magic" VARWORD VARWORD
 reduce: "reduce" expr
-draw: "draw" expr
+draw: "draw" VARWORD
 
 ?expr: subexpr | apply
 ?subexpr: var | mlambda | "(" expr ")" | list

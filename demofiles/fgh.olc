@@ -17,4 +17,5 @@ let fxomega = λf2 f1 n. n f2 f1 n;
 # lev4: lev3 -> lev3 = lev3 -> lev2 -> lev1 -> lev0 -> lev0
 let fpowomega = λf3 f2 f1 n. n f3 f2 f1 n;
 
-draw fsucc (fpowomega fxomega fsucc f0) c4;
+let f_ww = fsucc (fpowomega fxomega fsucc f0) c4;
+draw f_ww;
