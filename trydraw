@@ -32,3 +32,6 @@ def show_expr(lc):
 
 # New best version - 116 bits
 show_expr("(λc3 c2. c3 (c2 c2) (λn. n (λf b. b f (λx. x)) (λb f. c3 (b f)) c3) (c2 c2)) (λf x. f (f (f x))) (λf x. f (f x))")
+
+# Bigger number in fewer bits - 83 bits
+# show_expr("(λc2. (λg. g (g (g (g c2)))) (λn. n (λf b. b f (λx. x)) (λb. b c2) c2)) (λf x. f (f x))")
