@@ -20,7 +20,7 @@ import draw
 import lterm
 import parse
 
-TOPDIR=pathlib.path(__file__).resolve().parent
+TOPDIR=pathlib.Path(__file__).resolve().parent
 
 def verbose_reduce(expr, symbols):
     while True:
@@ -37,9 +37,16 @@ def flatten_symbols(expr, symbols):
             #print(f"flat: {expr}")
             return expr
         #print(f"flattening {expr}")
+        subst = None
         for p in symbols.items():
             if p[0] in free:
                 subst = p
+        if subst == None:
+            print(f"Defies flattening: {expr}")
+            return expr
+        if subst[0] in subst[1].variables(True):
+            print(f"Recursive: {expr}")
+            return expr
         #print(f"substituting {subst[0]} = {subst[1]}")
         expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
 
@@ -54,6 +61,7 @@ def try_file(tf, args):
     print(f"==== {tf}")
     symbols = {}
     directives = parse.parse_directives(tf.read_text())
+    drawing_counter = 1
     for d in directives.children:
         if d.data == "let":
             name, value = d.children
@@ -66,12 +74,18 @@ def try_file(tf, args):
             symbols[name.value] = lterm.get_magic(name.value, type.value)
             print(f"magic {name.value} {type.value}")
         elif d.data == "draw":
+            expr = d.children[0];
+            print(f"draw {expr}")
             expr = flatten_symbols(d.children[0], symbols)
+            print(f"flattened: {expr}")
             expr = optimize(expr)
+            print(f"optimized: {expr}")
             grid = draw.draw_expr(expr)
             grid.print()
             print(f"{expr.size()} bits")
-            #grid.writepbm("/tmp/out.pbm")
+            args.outdir.mkdir(parents=True, exist_ok=True)
+            grid.writepbm(args.outdir / f"l_{drawing_counter}.pbm")
+            drawing_counter += 1
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
