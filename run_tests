@@ -17,7 +17,7 @@ import all_tests
 
 def main():
     for name, inst in all_tests.all_tests().items():
-        print(name)
+        print(f"==== {name}")
         inst.check_all()
 
 if __name__ == '__main__':

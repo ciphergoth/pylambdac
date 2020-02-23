@@ -44,7 +44,13 @@ class Tdata(Test):
 class CheckConsistent(Tdata):
     def check_all(self):
         for example in self.read():
-            assert example[1] == self.answer(example[0])
+            ans = self.answer(example[0])
+            if example[1] != ans:
+                print("XXXX FAILURE. Expected value:")
+                json.dump(example[1], sys.stdout, indent=4, ensure_ascii=False)
+                print("XXXX FAILURE. Actual value:")
+                json.dump(ans, sys.stdout, indent=4, ensure_ascii=False)
+                assert False
 
     def fixup(self, examples):
         for example in examples:
