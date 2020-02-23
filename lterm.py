@@ -71,6 +71,12 @@ class SearchableStack():
     def pop(self):
         self.s.pop()
 
+    @contextlib.contextmanager
+    def add(self, v):
+        self.push(v)
+        yield
+        self.pop()
+
     def search(self, sv):
         for i, v in enumerate(reversed(self.s)):
             if v == sv:
@@ -109,6 +115,9 @@ class Term:
     def variables(self, free):
         return set(self._variables(free))
 
+    def size(self):
+        return self._size(SearchableStack())
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -140,6 +149,9 @@ class Var(Term):
 
     def draw(self, grid, ro, co, ll):
         grid.drawv(ll[self.name], ro, co)
+
+    def _size(self, names):
+        return 2 + names.search(self.name)
 
 class Apply(Term):
     def __init__(self, a, b):
@@ -187,6 +199,8 @@ class Apply(Term):
         grid.drawh(ro + self.draw_dims[0] -1, co + self.draw_dims[2], co + self.draw_dims[3])
         grid.drawv(ro + self.b.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[3])
 
+    def _size(self, names):
+        return 2 + self.a._size(names) + self.b._size(names)
 
 class Lambda(Term):
     def __init__(self, v, e):
@@ -217,9 +231,8 @@ class Lambda(Term):
             yield from self.e._prefixcode(None)
         else:
             yield "λ^"
-            names.push(self.v)
-            yield from self.e._prefixcode(names)
-            names.pop()
+            with names.add(self.v):
+                yield from self.e._prefixcode(names)
 
     def lambda_subst(self, expr, syms):
         forbidden = self.e.variables(False)
@@ -245,6 +258,11 @@ class Lambda(Term):
         ll[self.v] = ro
         self.e.draw(grid, ro + 1, co, ll)
         ll[self.v] = old
+
+    def _size(self, names):
+        with names.add(self.v):
+            return 2 + self.e._size(names)
+
 
 class Magic(Term):
     def __init__(self, name):

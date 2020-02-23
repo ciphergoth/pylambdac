@@ -1,4 +1,4 @@
-# Copyright 2018 Google LLC
+# Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
+import parse
+import tdata
 
-def all_tests():
-    return {n: importlib.import_module(f"test_{n}").Test(n)
-        for n in ['eager', 'freevar', 'parse', 'reduce', 'size', 'varsubst', 'y']}
+class Test(tdata.CheckConsistent):
+    def answer(self, example):
+        return parse.parse_expr(example).size()

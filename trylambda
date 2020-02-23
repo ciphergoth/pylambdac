@@ -41,17 +41,6 @@ def flatten_symbols(expr, symbols):
         print(f"substituting {subst[0]} = {subst[1]}")
         expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
 
-def measure_size(expr):
-    score = 0
-    for t in expr._prefixcode(lterm.SearchableStack()):
-        if t == "." or t == "λ^":
-            score += 2
-        elif t == "^":
-            pass
-        else:
-            score += 2 + int(t)
-    return score
-
 def try_file(tf):
     print(f"==== {tf}")
     symbols = {}
@@ -71,7 +60,7 @@ def try_file(tf):
             expr = flatten_symbols(d.children[0], symbols)
             grid = draw.draw_expr(expr)
             grid.print()
-            print(f"{measure_size(expr)} bits")
+            print(f"{expr.size()} bits")
         elif d.data == "reduce":
             verbose_reduce(d.children[0], symbols)
             print()
