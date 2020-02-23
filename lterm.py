@@ -231,6 +231,10 @@ class Lambda(Term):
 class Magic(Term):
     def __init__(self, name):
         self.name = name
+        # These can't actually be drawn,
+        # but we discover that at draw time
+        # so just ensure we don't break init-time calculation.
+        self.draw_dims = (0, 1, 0, 0)
 
     def _str(self, bracketa, bracketl):
         yield self.name
