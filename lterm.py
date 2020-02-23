@@ -61,6 +61,22 @@ class VarSubst:
         else:
             return var
 
+class SearchableStack():
+    def __init__(self):
+        self.s = []
+
+    def push(self, v):
+        self.s.append(v)
+
+    def pop(self):
+        self.s.pop()
+
+    def search(self, sv):
+        for i, v in enumerate(reversed(self.s)):
+            if v == sv:
+                return i
+        return None
+
 class Term:
     def equiv(self, other):
         if not isinstance(other, Term):
@@ -71,7 +87,7 @@ class Term:
         return self
 
     def prefixcode(self, *, debruijn):
-        return " ".join(self._prefixcode([] if debruijn else None))
+        return " ".join(self._prefixcode(SearchableStack() if debruijn else None))
 
     def __str__(self):
         return "".join(self._str(False, False))
@@ -102,12 +118,14 @@ class Var(Term):
         yield self.name
 
     def _prefixcode(self, names):
-        if names is not None and self.name in names:
-            yield "^"
-            yield str(next(i for i, v in enumerate(reversed(names)) if v == self.name))
-        else:
-            yield "\'"
-            yield self.name
+        if names is not None:
+            position = names.search(self.name)
+            if position is not None:
+                yield "^"
+                yield str(position)
+                return
+        yield "\'"
+        yield self.name
 
     def reduce_once(self, syms):
         # This is safe because it's only called for vars
@@ -199,7 +217,7 @@ class Lambda(Term):
             yield from self.e._prefixcode(None)
         else:
             yield "λ^"
-            names.append(self.v)
+            names.push(self.v)
             yield from self.e._prefixcode(names)
             names.pop()
 

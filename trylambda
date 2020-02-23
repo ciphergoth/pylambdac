@@ -43,7 +43,7 @@ def flatten_symbols(expr, symbols):
 
 def measure_size(expr):
     score = 0
-    for t in expr._prefixcode([]):
+    for t in expr._prefixcode(lterm.SearchableStack()):
         if t == "." or t == "λ^":
             score += 2
         elif t == "^":
