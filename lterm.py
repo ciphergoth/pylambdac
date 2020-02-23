@@ -104,7 +104,7 @@ class Var(Term):
     def _prefixcode(self, names):
         if names is not None and self.name in names:
             yield "^"
-            yield str(names.index(self.name))
+            yield str(next(i for i, v in enumerate(reversed(names)) if v == self.name))
         else:
             yield "\'"
             yield self.name
@@ -199,9 +199,9 @@ class Lambda(Term):
             yield from self.e._prefixcode(None)
         else:
             yield "λ^"
-            names.insert(0, self.v)
+            names.append(self.v)
             yield from self.e._prefixcode(names)
-            del names[0]
+            names.pop()
 
     def lambda_subst(self, expr, syms):
         forbidden = self.e.variables(False)
