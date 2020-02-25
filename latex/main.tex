@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\title{Ordinals}
+\author{Paul Crowley}
+\begin{document}
+\maketitle
+Ordinals are cool.
+
+\textbf{ZFC}: I'll be using lots of axioms from ZFC, but I'll mention two explicitly:
+
+\textbf{Axiom of Extensionality:} In what follows, the only thing that can be an element of a set is another set; this is implicit in ZFC's Axiom of Extensionality. There are other ways of looking at sets but this is the most usual way in mathematical logic.
+
+\textbf{Axiom of Foundation:} I'm also going to make use of the Axiom of Foundation (aka the Axiom of Regularity), which states that every nonempty set has at least one element that's disjoint with the set: $\forall S \neq \emptyset:  \exists x \in S: x \cap S = \emptyset$. This axiom disallows all sorts of pathological sets; for example, we can't have a set $A$ such that $A \in A$, since then the set $\{A\}$ would have no disjoint element. Similarly, we can't have a loop $A \in B \in C \in A$, since the set $\{A, B, C, A\}$ is disallowed; the same goes for an infinite chain $A_1 \ni A_2 \ni A_3 \ni \ldots$ via the set $\{A_1, A_2, A_3, \ldots\}$---though note that $A_1 \in A_2 \in A_3 \in \ldots$ can be allowed, so long as $A_1$ is disjoint with $\{A_1, A_2, A_3, \ldots\}$.
+
+\textbf{Transitive Set:} A transitive set is a set all of whose elements are also subsets; $A$ is a transitive set iff $\forall a \in A: a \subseteq A$.
+
+\textbf{Ordinal:} An ordinal is a transitive set of transitive sets. $\alpha$ is an ordinal iff $\forall \beta \in \alpha: \beta \subseteq \alpha \wedge \forall \gamma \in \beta: \gamma \subseteq \beta$. This isn't the standard definition of an ordinal, but it's much easier to work with; one of the things that motivated me to write this document was how much easier everything got when I tried using this definition instead.
+
+\textbf{0:} The empty set is an ordinal. It doesn't have any elements that aren't subsets, and it doesn't have any that aren't transitive sets! The usual notation for this is $\emptyset$ or $\{\}$, but here we'll call it simply 0.
+
+\textbf{Successor:} If $\alpha$ is an ordinal, so is $\alpha \cup \{\alpha\}$; we call this the successor, or $\alpha + 1$. Proof: Since $\alpha$ is a transitive set, all its elements are subsets of $\alpha$ and therefore also subsets of $\alpha + 1$. By construction $\alpha$ is also a subset of $\alpha + 1$; therefore $\alpha + 1$ is a transitive set. Since both $\alpha$ and all its elements are transitive sets, $\alpha + 1$ consists entirely of transitive sets. Therefore $\alpha + 1$ is an ordinal. This allows us to construct lots of ordinals:
+
+\begin{tabular}{ l l l }
+0 & $\{\}$ & $\{\}$ \\
+1 & $\{0\}$ & $\{\{\}\}$ \\
+2 & $\{0, 1\}$ & $\{\{\}, \{\{\}\}\}$ \\
+3 & $\{0, 1, 2\}$ & $\{\{\}, \{\{\}\}, \{\{\}, \{\{\}\}\}\}$ \\
+\end{tabular}
+
+In each case we have eg $3 = 2 + 1 = 2 \cup \{2\} = \{0, 1\} \cup \{2\} = \{0, 1, 2\}$.
+
+\textbf{Union:} The union of a set of ordinals is an ordinal. Since all elements of ordinals are transitive sets, all elements of the union will be transitive sets; since all elements are subsets of some component of the union they are subsets of the whole union.
+
+\textbf{$\omega$:} This gives us our first infinite ordinal, $\omega = \bigcup\{0, 1, 2, 3, \ldots\} =  \{0, 1, 2, 3, \ldots\}$. We can also construct $\omega + 1$ in the usual way.
+
+\textbf{Elements of ordinals are ordinals:} An element of an ordinal is also a subset. Since the ordinal is composed of transitive sets, so is any element.
+
+\textbf{Among ordinals, membership is transitive:} If $\alpha_1, \alpha_2, \alpha_3$ are ordinals such that $\alpha_1 \in \alpha_2 \in \alpha_3$ then  since $\alpha_2 \in \alpha_3$ implies $\alpha_2 \subseteq \alpha_3$, $\alpha_1 \in \alpha_3$.
+
+\textbf{Set membership is asymmetric:} The Axiom of Foundation forbids sets such that $A \in A$ or $A \in B \in A$; set membership is therefore both irreflexive and antisymmetric.
+
+\textbf{Set membership is well-founded:} The Axiom of Foundation guarantees that any nonempty set $S$ will have at least one element $x$ such that $\forall y \in S: y \not\in x$ ie $x \cap S = \emptyset$. We call this an $\in$-minimal element.
+
+\textbf{Proper subset ordinals are elements:} If $\alpha_1, \alpha_2$ are ordinals such that $\alpha_2 \subsetneq \alpha_1$ then $\alpha_2 \in \alpha_1$. Proof: 
+\begin{itemize}
+\item If this is not so, we can construct an infinite descending chain of ordinals $\alpha_k$.
+\item Assume $\alpha_{k+1} \subsetneq \alpha_k$ and $\alpha_{k+1} \not\in \alpha_k$; this is what we're assuming by contradiction for $k=1$.
+\item Let $\alpha_{k+2}$ be an $\in$-minimal element of $\alpha_k \setminus \alpha_{k+1}$ ie $\alpha_{k+2} \cap (\alpha_k \setminus \alpha_{k+1}) = \emptyset$.
+\item $\alpha_{k+2} \in \alpha_k$ and $\alpha_k$ is a transitive set, so $\alpha_{k+2} \subseteq \alpha_k$ 
+\item Every element of $\alpha_{k+2}$ is a element of $\alpha_k$ but not $\alpha_k \setminus \alpha_{k+1}$. Therefore $\alpha_{k+2} \subseteq \alpha_{k+1}$
+\item Since $\alpha_{k+2} \in \alpha_k$ we have that $\alpha_{k+2} \neq \alpha_{k+1}$
+\item therefore $\alpha_{k+2} \subsetneq \alpha_{k+1}$ and $\alpha_{k+2} \not\in \alpha_{k+1}$
+\item By this means we can construct an infinite chain $\alpha_1 \ni \alpha_3 \ni \alpha_5 \ldots$; however this is disallowed by the Axiom of Foundation.
+\end{itemize}
+
+\textbf{Intersection:} The intersection of a set of ordinals is an ordinal; the proof is almost exactly the same as for the union case.
+
+\textbf{Ordinals are trichotomous:} For any two ordinals $\alpha, \beta$, $\alpha \in \beta \vee \alpha = \beta \vee \alpha \ni \beta$. Proof by contradiction: 
+\begin{itemize}
+\item By contradiction, suppose there exist  $\alpha, \beta$ such that $\alpha \not\in \beta \wedge \alpha \neq \beta \wedge \alpha \not\ni \beta$
+\item Since both are ordinals, $\alpha \not\in \beta$ implies $\alpha \not\subsetneq \beta$ and similarly $\beta \not\subsetneq \alpha$
+\item Given that they're not equal either, $\alpha \cap \beta \subsetneq \alpha$ and $\alpha \cap \beta \subsetneq \beta$
+\item $\alpha \cap \beta$ is an ordinal; therefore $\alpha \cap \beta \in \alpha$ and $\alpha \cap \beta \in \beta$
+\item $\alpha \cap \beta \in \alpha \cap \beta$, violating the Axiom of Foundation.
+\end{itemize}
+
+\textbf{Ordinals are well-ordered by membership:} this just puts together what we've already proven. This also means that the elements of an ordinal are well-ordered by membership, as required by the standard Von Neumann definition.
+
+\end{document}
