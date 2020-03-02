@@ -42,6 +42,7 @@ def flatten_symbols(name, symbols):
                 subst = p
         if subst == None:
             print(f"Defies flattening: {expr}")
+            print(f"Free variables: {free}")
             return expr
         if subst[0] in subst[1].variables(True):
             print(f"Recursive: {expr}")
