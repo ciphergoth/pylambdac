@@ -55,6 +55,7 @@ def optimize(expr):
         if newexpr is None:
             return expr
         expr = newexpr
+        print(f"optimized: {expr}")
 
 def try_file(tf, args):
     print(f"==== {tf}")
@@ -77,7 +78,6 @@ def try_file(tf, args):
             expr = flatten_symbols(name, symbols)
             print(f"flattened: {expr}")
             expr = optimize(expr)
-            print(f"optimized: {expr}")
             draw.draw_expr(3, expr).print()
             print(f"{expr.size()} bits")
             if args.outdir:
