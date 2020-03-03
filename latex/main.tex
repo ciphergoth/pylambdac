@@ -1,3 +1,17 @@
+% Copyright 2020 Google LLC
+%
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+%
+%      http://www.apache.org/licenses/LICENSE-2.0
+%
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb}
@@ -43,12 +57,12 @@ In each case we have eg $3 = 2 + 1 = 2 \cup \{2\} = \{0, 1\} \cup \{2\} = \{0, 1
 
 \textbf{Set membership is well-founded:} The Axiom of Foundation guarantees that any nonempty set $S$ will have at least one element $x$ such that $\forall y \in S: y \not\in x$ ie $x \cap S = \emptyset$. We call this an $\in$-minimal element.
 
-\textbf{Proper subset ordinals are elements:} If $\alpha_1, \alpha_2$ are ordinals such that $\alpha_2 \subsetneq \alpha_1$ then $\alpha_2 \in \alpha_1$. Proof: 
+\textbf{Proper subset ordinals are elements:} If $\alpha_1, \alpha_2$ are ordinals such that $\alpha_2 \subsetneq \alpha_1$ then $\alpha_2 \in \alpha_1$. Proof:
 \begin{itemize}
 \item If this is not so, we can construct an infinite descending chain of ordinals $\alpha_k$.
 \item Assume $\alpha_{k+1} \subsetneq \alpha_k$ and $\alpha_{k+1} \not\in \alpha_k$; this is what we're assuming by contradiction for $k=1$.
 \item Let $\alpha_{k+2}$ be an $\in$-minimal element of $\alpha_k \setminus \alpha_{k+1}$ ie $\alpha_{k+2} \cap (\alpha_k \setminus \alpha_{k+1}) = \emptyset$.
-\item $\alpha_{k+2} \in \alpha_k$ and $\alpha_k$ is a transitive set, so $\alpha_{k+2} \subseteq \alpha_k$ 
+\item $\alpha_{k+2} \in \alpha_k$ and $\alpha_k$ is a transitive set, so $\alpha_{k+2} \subseteq \alpha_k$
 \item Every element of $\alpha_{k+2}$ is a element of $\alpha_k$ but not $\alpha_k \setminus \alpha_{k+1}$. Therefore $\alpha_{k+2} \subseteq \alpha_{k+1}$
 \item Since $\alpha_{k+2} \in \alpha_k$ we have that $\alpha_{k+2} \neq \alpha_{k+1}$
 \item therefore $\alpha_{k+2} \subsetneq \alpha_{k+1}$ and $\alpha_{k+2} \not\in \alpha_{k+1}$
@@ -57,7 +71,7 @@ In each case we have eg $3 = 2 + 1 = 2 \cup \{2\} = \{0, 1\} \cup \{2\} = \{0, 1
 
 \textbf{Intersection:} The intersection of a set of ordinals is an ordinal; the proof is almost exactly the same as for the union case.
 
-\textbf{Ordinals are trichotomous:} For any two ordinals $\alpha, \beta$, $\alpha \in \beta \vee \alpha = \beta \vee \alpha \ni \beta$. Proof by contradiction: 
+\textbf{Ordinals are trichotomous:} For any two ordinals $\alpha, \beta$, $\alpha \in \beta \vee \alpha = \beta \vee \alpha \ni \beta$. Proof by contradiction:
 \begin{itemize}
 \item By contradiction, suppose there exist  $\alpha, \beta$ such that $\alpha \not\in \beta \wedge \alpha \neq \beta \wedge \alpha \not\ni \beta$
 \item Since both are ordinals, $\alpha \not\in \beta$ implies $\alpha \not\subsetneq \beta$ and similarly $\beta \not\subsetneq \alpha$
