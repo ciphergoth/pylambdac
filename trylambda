@@ -20,14 +20,6 @@ import draw
 import lterm
 import parse
 
-def verbose_reduce(expr, symbols):
-    while True:
-        print("    ", expr)
-        next = expr.reduce_once(symbols)
-        if next is None:
-            return expr
-        expr = next
-
 def flatten_symbols(name, symbols):
     expr = symbols[name]
     while True:
@@ -43,10 +35,10 @@ def flatten_symbols(name, symbols):
         if subst == None:
             print(f"Defies flattening: {expr}")
             print(f"Free variables: {free}")
-            return expr
+            return None
         if subst[0] in subst[1].variables(True):
             print(f"Recursive: {expr}")
-            return expr
+            return None
         #print(f"substituting {subst[0]} = {subst[1]}")
         expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
 
@@ -58,35 +50,50 @@ def optimize(expr):
         expr = newexpr
         print(f"optimized: {expr}")
 
+class Processor:
+    def __init__(self, args):
+        self._args = args
+        self._symbols = {}
+
+    def do_let(self, name, value):
+        print(f"let {name.value} = {value}")
+        assert name.value not in self._symbols
+        self._symbols[name.value] = value
+
+    def do_magic(self, name, mtype):
+        print(f"magic {name.value} {mtype.value}")
+        assert name.value not in self._symbols
+        self._symbols[name.value] = lterm.get_magic(name.value, mtype.value)
+
+    def do_reduce(self, expr):
+        print(f"reduce {expr}")
+        while True:
+            print("    ", expr)
+            next = expr.reduce_once(self._symbols)
+            if next is None:
+                print()
+                return
+            expr = next
+
+    def do_draw(self, name):
+        print(f"draw {name}")
+        expr = flatten_symbols(name, self._symbols)
+        if expr is None:
+            return
+        print(f"flattened: {expr}")
+        expr = optimize(expr)
+        draw.draw_expr(3, expr).print()
+        print(f"{expr.size()} bits")
+        if self._args.outdir:
+            self._args.outdir.mkdir(parents=True, exist_ok=True)
+            draw.draw_expr(4, expr).write_image(self._args.outdir / f"{name}.png")
+
 def try_file(tf, args):
     print(f"==== {tf}")
-    symbols = {}
+    processor = Processor(args)
     directives = parse.parse_directives(tf.read_text())
-    for d in directives.children:
-        if d.data == "let":
-            name, value = d.children
-            assert name.value not in symbols
-            symbols[name.value] = value
-            print(f"let {name.value} = {value}")
-        elif d.data == "magic":
-            name, type = d.children
-            assert name.value not in symbols
-            symbols[name.value] = lterm.get_magic(name.value, type.value)
-            print(f"magic {name.value} {type.value}")
-        elif d.data == "draw":
-            name = d.children[0];
-            print(f"draw {name}")
-            expr = flatten_symbols(name, symbols)
-            print(f"flattened: {expr}")
-            expr = optimize(expr)
-            draw.draw_expr(3, expr).print()
-            print(f"{expr.size()} bits")
-            if args.outdir:
-                args.outdir.mkdir(parents=True, exist_ok=True)
-                draw.draw_expr(4, expr).write_image(args.outdir / f"{name}.png")
-        elif d.data == "reduce":
-            verbose_reduce(d.children[0], symbols)
-            print()
+    for directive in directives.children:
+        getattr(processor, f"do_{directive.data}")(*directive.children)
 
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
