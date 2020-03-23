@@ -27,7 +27,7 @@ mlambda: ("λ" | "\\") varlist "." expr
 list: "[" subexpr* "]"
 
 varlist: VARWORD*
-VARWORD: ("_"|LETTER|DIGIT)+
+VARWORD: ("_"|LETTER|DIGIT|"α"|"β"|"γ"|"δ"|"ε"|"ζ"|"ω")+
 
 COMMENT: /#[^\n]*/
 %ignore WS
