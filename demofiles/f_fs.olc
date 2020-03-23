@@ -20,8 +20,11 @@ let c1 = λx. x;
 let c2 = λf x. f (f x);
 let c3 = λf x. f (f (f x));
 let c4 = λf x. f (f (f (f x)));
+# csucc: N -> N
 let csucc = λn f x. n f (f x);
 
+
+# See `ordinals.md` for details of the representation here.
 # all limit ordinals have fundamental sequences here.
 # A function F on ordinals we define in three parts z s l:
 # F(0) = z
@@ -30,70 +33,72 @@ let csucc = λn f x. n f (f x);
 # We express an ordinal as a thing that calculates F given z s l
 # F(α) = α z s l
 # Let T be whatever type F returns
-# F: o -> T
+# F: Ord -> T
 # z: T
 # s: T -> T
-# l: (church -> T) -> T
-# So o = T -> (T -> T) -> ((church -> T) -> T) -> T
+# l: (N -> T) -> T
+# So Ord = T -> (T -> T) -> ((N -> T) -> T) -> T
 
-# o0: o
+# o0: Ord
 let o0 = λz s l. z;
-# osucc: o -> o
+# osucc: Ord -> Ord
 let osucc = λo z s l. s (o z s l);
+# olim: (N -> Ord) -> Ord
+let olim = λf z s l. l (λi. f i z s l);
 
+# Finite numbers
 let o1 = osucc o0;
 let o2 = osucc o1;
 let o3 = osucc o2;
 
-# olim: (church -> o) -> o
-let olim = λf z s l. l (λi. f i z s l);
-# omega: o
-let omega = olim λn. n osucc o0;
+# omega: Ord
+#let omega = olim λn. n osucc o0; # Straightforward definition
+let omega = λz s l. l (λi. i s z); # Optimized definition
 
 # For a continuous function, where where α is a limit ordinal
 # F(α)[n] = F(α[n]) so l is just olim
 
-# oadd: o -> o -> o
+# oadd: Ord -> Ord -> Ord
 # a + 0 = a, a + (b + 1) = (a + b) + 1
 let oadd = λa b. b a osucc olim;
 
 # C combinator, swap arguments to function
 let C = λf x y. f y x;
 
-# omul: o -> o -> o
+# omul: Ord -> Ord -> Ord
 # a * 0 = 0, a * (b + 1) = (a * b) + a
 let omul = λa b. b o0 (C oadd a) olim;
 
-# opow: o -> o -> o
+# opow: Ord -> Ord -> Ord
 # a^0 = 1, a^{b + 1} = a^b * a
 let opow = λa b. b o1 (C omul a) olim;
 
 # First fixed point of f >= o where f strictly increasing, continuous
-# fixedp: (o -> o) -> o -> o
+# fixedp: (Ord -> Ord) -> Ord -> Ord
 let fixedp = λf o. olim λn. n f o;
 
-# epsilon0: o
+# epsilon0: Ord
 let epsilon0 = fixedp (opow omega) o0;
 
 # stepfix (fixedp f) a = a'th fixed point of f, where a is an ordinal
-# stepfix: (o -> o) -> o -> o
+# stepfix: (Ord -> Ord) -> Ord -> Ord
 # stepfix f o0 = f o0
 # stepfix f (osucc a) = f (osucc (stepfix f a))
 let stepfix = λf o. o (f o0) (λp. f (osucc p)) olim;
 
 # Derivative of f, enumerates solutions of x = f x
-# deriv: (o -> o) -> (o -> o)
+# deriv: (Ord -> Ord) -> (Ord -> Ord)
 let deriv = λf. stepfix (fixedp f);
 
 # Two-argument Veblen function
-# veblen2: o -> o -> o
+# veblen2: Ord -> Ord -> Ord
 let veblen2 = λalpha. alpha
     (opow omega)
-    (λpf. deriv pf) # pf: o -> o
-    (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: church -> o -> o
+    (λpf. deriv pf) # pf: Ord -> Ord
+    (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N -> Ord -> Ord
 
 # fast-growing hierarchy
-# fgh: o -> church -> church
+# fgh: Ord -> N -> N
 let fgh = λ o. o csucc (λ f n. n f n) (λf n. f n n);
 
 let f_0 = fgh o0 c4;
