@@ -15,6 +15,7 @@
 # https://johncarlosbaez.wordpress.com/2016/07/07/large-countable-ordinals-part-3/
 
 # Church integers
+# c0, c1... : N
 let c0 = λf x. x;
 let c1 = λx. x;
 let c2 = λf x. f (f x);
@@ -25,7 +26,6 @@ let csucc = λn f x. n f (f x);
 
 
 # See `ordinals.md` for details of the representation here.
-# all limit ordinals have fundamental sequences here.
 # A function F on ordinals we define in three parts z s l:
 # F(0) = z
 # F(α + 1) = s F(α)
@@ -47,18 +47,20 @@ let osucc = λα z s l. s (α z s l);
 let olim = λf z s l. l (λi. f i z s l);
 
 # Finite numbers
-# let toord = λn. n osucc o0;
+# to_ord: N -> Ord
+# let to_ord = λn. n osucc o0;
 # Optimized
-let toord = λn z s l. n s z;
+let to_ord = λn z s l. n s z;
 
-let o1 = toord c1;
-let o2 = toord c2;
+# o1, o2: Ord
+let o1 = to_ord c1;
+let o2 = to_ord c2;
 
 # ω: Ord
-#let ω = olim λn. n osucc o0; # Straightforward definition
+#let ω = olim to_ord; # Straightforward definition
 let ω = λz s l. l (λi. i s z); # Optimized definition
 
-# For a continuous function, where where α is a limit ordinal
+# For a continuous function, where α is a limit ordinal
 # F(α)[n] = F(α[n])
 # so l is just olim
 
@@ -96,14 +98,14 @@ let deriv = λf. stepfix (fixedp f);
 
 # Two-argument Veblen function
 # veblen2: Ord -> Ord -> Ord
-let veblen2 = λalpha. alpha
+let veblen2 = λα. α
     (opow ω)
-    (λpf. deriv pf) # pf: Ord -> Ord
+    deriv
     (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N -> Ord -> Ord
 
 # fast-growing hierarchy
 # fgh: Ord -> N -> N
-let fgh = λ α. α csucc (λ f n. n f n) (λf n. f n n);
+let fgh = λ α. α csucc (λ f n. n f n) (λlf n. lf n n);
 
 let f_0 = fgh o0 c4;
 draw f_0;
