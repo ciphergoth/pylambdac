@@ -10,6 +10,6 @@ preserve variable names and rename as appropriate during beta reduction.
 
 Dependencies:
 
-        pip3 install lark-parser
+        pip3 install lark-parser mistletoe
 
 This is not an officially supported Google product.

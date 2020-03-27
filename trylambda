@@ -18,6 +18,7 @@ import pathlib
 
 import draw
 import lterm
+import markcode
 import parse
 
 def flatten_symbols(name, symbols):
@@ -88,10 +89,17 @@ class Processor:
             self._args.outdir.mkdir(parents=True, exist_ok=True)
             draw.draw_expr(4, expr).write_image(self._args.outdir / f"{name}.png")
 
+def file_text(tf):
+    if tf.suffix == ".md":
+        with tf.open() as fp:
+            return markcode.blockcodes_as_string(fp)
+    else:
+        return tf.read_text()
+
 def try_file(tf, args):
     print(f"==== {tf}")
+    directives = parse.parse_directives(file_text(tf))
     processor = Processor(args)
-    directives = parse.parse_directives(tf.read_text())
     for directive in directives.children:
         getattr(processor, f"do_{directive.data}")(*directive.children)
 
