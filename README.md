@@ -8,8 +8,9 @@ hierarchy](http://googology.wikia.com/wiki/Fast-growing_hierarchy). It's a desig
 computation be easy to follow as it's printed, so instead of eg converting to de Bruijn form, we
 preserve variable names and rename as appropriate during beta reduction.
 
-Dependencies:
+Try eg
 
-        pip3 install lark-parser mistletoe
+    pipenv update
+    pipenv run ./trylambda --outdir=/tmp/out demofiles/*
 
 This is not an officially supported Google product.
