@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import parse
-import tdata
+import pathlib
 
-class Test(tdata.CheckConsistent):
-    def answer(self, example):
-        return parse.parse_expr(example).size()
+_file = pathlib.Path(__file__).resolve()
+
+top = _file.parent.parent

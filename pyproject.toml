@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "pylambdac"
+version = "0.1.0"
+description = ""
+authors = ["Paul Crowley <paulcrowley@google.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+lark-parser = "^0.8.2"
+pillow = "^7.0.0"
+mistletoe = "^0.7.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

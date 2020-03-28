@@ -16,10 +16,10 @@
 import argparse
 import pathlib
 
-import draw
-import lterm
-import markcode
-import parse
+from pylambdac import draw
+from pylambdac import lterm
+from pylambdac import markcode
+from pylambdac import parse
 
 def flatten_symbols(name, symbols):
     expr = symbols[name]

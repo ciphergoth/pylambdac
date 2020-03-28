@@ -16,7 +16,7 @@
 import argparse
 import pathlib
 
-import all_tests
+from tests import all_tests
 
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)

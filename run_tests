@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import all_tests
+from tests import all_tests
 
 def main():
     for name, inst in all_tests.all_tests().items():

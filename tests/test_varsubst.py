@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import parse
+from pylambdac import parse
 
-import tdata
+from tests import tdata
 
 examples = [
     ({"foo": "λx.x x"}, ["foo bar", "(λx.x x) bar", "bar bar"]),

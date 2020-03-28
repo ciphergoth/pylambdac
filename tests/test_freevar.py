@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import lterm
-import parse
-import tdata
+from pylambdac import parse
 
-class Test(tdata.CheckConsistent):
-    def answer(self, example):
-        symbols = {"Y": lterm.MagicY("Y")}
-        new = []
-        expr = parse.parse_expr(example)
-        while True:
-            new.append([str(expr), expr.prefixcode(debruijn=True)])
-            expr = expr.reduce_once(symbols)
-            if expr is None:
-                break
-        return new
+from tests import tdata
+
+examples = [
+    ("x", {"x"}),
+    ("λx. x x", set()),
+    ("λx. y x", {"y"}),
+]
+
+class Test(tdata.Test):
+    def check_all(self):
+        for expr, res in examples:
+            expr = parse.parse_expr(expr)
+            assert res == expr.variables(True)

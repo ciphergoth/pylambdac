@@ -17,7 +17,7 @@ import json
 import pathlib
 import sys
 
-import paths
+from pylambdac import paths
 
 def read_json(fn):
     with fn.open() as f:

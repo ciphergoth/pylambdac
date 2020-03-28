@@ -12,8 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
+from pylambdac import parse
 
-_file = pathlib.Path(__file__).resolve()
+from tests import tdata
 
-top = _file.parent
+class Test(tdata.CheckConsistent):
+    def answer(self, example):
+        new  = []
+        state = parse.parse_expr(example)
+        while state is not None:
+            new.append(str(state))
+            state = state.reduce_once({})
+        return new

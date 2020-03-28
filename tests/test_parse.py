@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
+from pylambdac import parse
 
-def all_tests():
-    return {n: importlib.import_module(f"test_{n}").Test(n)
-        for n in ['eager', 'freevar', 'parse', 'reduce', 'size', 'varsubst', 'y']}
+from tests import tdata
+
+class Test(tdata.CheckConsistent):
+    def answer(self, s):
+        return parse.parse_expr(s).prefixcode(debruijn=False)
