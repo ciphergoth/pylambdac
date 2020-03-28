@@ -63,25 +63,26 @@ class VarSubst:
 
 class SearchableStack():
     def __init__(self):
-        self.s = []
-
-    def push(self, v):
-        self.s.append(v)
-
-    def pop(self):
-        self.s.pop()
+        self.s = {}
+        self.l = 0
 
     @contextlib.contextmanager
     def add(self, v):
-        self.push(v)
+        old = self.s.get(v)
+        self.l += 1
+        self.s[v] = self.l
         yield
-        self.pop()
+        if old is None:
+            del self.s[v]
+        else:
+            self.s[v] = old
+        self.l -= 1
 
     def search(self, sv):
-        for i, v in enumerate(reversed(self.s)):
-            if v == sv:
-                return i
-        return None
+        r = self.s.get(sv)
+        if r is None:
+            return None
+        return self.l - r
 
 class Term:
     def equiv(self, other):
