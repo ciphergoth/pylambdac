@@ -1,124 +1,175 @@
-Start here: [Large Countable Ordinals](https://johncarlosbaez.wordpress.com/2016/07/07/large-countable-ordinals-part-3/) by John Baez.
+# Large numbers using the fast-growing hierarchy
 
-Church integers
-c0, c1... : N
+A nice way to describe a really large number is to describe a big ordinal, and plug it in to the
+[fast-growing hierarchy](http://googology.wikia.com/wiki/Fast-growing_hierarchy). For this, some
+familiarity with countable ordinals is needed; everything I know about the subject is in John Baez's
+excellent series of blog posts Large Countable Ordinals ([part
+1](https://johncarlosbaez.wordpress.com/2016/06/29/large-countable-ordinals-part-1/), [part
+2](https://johncarlosbaez.wordpress.com/2016/07/04/large-countable-ordinals-part-2/), [part
+3](https://johncarlosbaez.wordpress.com/2016/07/07/large-countable-ordinals-part-3/)).
+
+Let's start by looking at the standard way to define natural numbers (**N**), using [Church
+encoding](https://en.wikipedia.org/wiki/Church_encoding). Though this is the untyped lambda
+calculus, it can help to think of functions as having "types" indicating their purpose, so
+we'll call Church integers **N**, and zero is
+`c0`: **N**
 
     let c0 = λf x. x;
+
+while the successor function is
+`csucc`: **N** → **N**, ie a function from N to N.
+
+    let csucc = λn f x. n f (f x);
+
+We could define integers above zero as eg `let c1 = csucc c0`, but I'm optimizing for fewer bits in
+the final expression here, so let's define these by hand:
+`c1, c2, c3, c4`: **N**
+
     let c1 = λx. x;
     let c2 = λf x. f (f x);
     let c3 = λf x. f (f (f x));
     let c4 = λf x. f (f (f (f x)));
 
-csucc: N -> N
+With this structure, we say that if you have some function on natural numbers
+such that you know *F*(0) = *z*, and there exists a function *s* such that
+*F*(*n* + 1) = *s*(*F*(*n*)), then the lambda calculus representation of
+*F*(*x*) is simply `x s z`.
 
-    let csucc = λn f x. n f (f x);
+We can extend this idea to represent countable ordinals with fundamental sequences
+in lambda calculus if we add a way of handling limits.
+For this we ask for a function *l* such that where *α* is a limit ordinal,
+*F*(*α*) = *l*(λ*i*. *F*(*α*[*i*])); in other words, we hand *l* a function
+that maps integers to *F* applied to that index in the limit sequence. Thus
+an ordinal *α* is a function which takes these three parameters *z*, *s*, *l*,
+and returns *F*(*α*) ie `α z s l` = *F*(*α*).
 
+Let's call the type of computable countable ordinals with fundamental
+sequences **Ord**, and suppose *F* is a function which takes an ordinal
+and returns some type **T**. Then the three parts we'll use to represent *F*
+have types:
 
-A function F on ordinals we define in three parts z s l:
-* F(0) = z
-* F(α + 1) = s F(α)
-* F(α) = l (λi. F(α[i])) where α is a limit ordinal
+* *z*: **T**
+* *s*: **T** → **T**
+* *l*: (**N** → **T**) → **T**
 
-We express an ordinal as a thing that calculates F given z s l
+and the type **Ord** takes one of each:
 
-* F(α) = α z s l
+* **Ord** = **T** → (**T** → **T**) → ((**N** → **T**) → **T**) → **T**
 
-Let T be whatever type F returns
+Note that "**A** → **B** → **C**" should be interpreted as
+"**A** → (**B** → **C**)" as per the usual convention for representing
+multi-argument functions in the lambda calculus; see also
+[Currying](https://en.wikipedia.org/wiki/Currying).
 
-* F: Ord -> T
-* z: T
-* s: T -> T
-* l: (N -> T) -> T
-* Ord = T -> (T -> T) -> ((N -> T) -> T) -> T
-
-o0: Ord
+Ordinal zero
+`o0`: **Ord**
 
     let o0 = λz s l. z;
 
-osucc: Ord -> Ord
+Ordinal successor
+`osucc`: **Ord** → **Ord**
 
     let osucc = λα z s l. s (α z s l);
 
-olim: (N -> Ord) -> Ord
+We define limits using a function which takes an index and returns the ordinal
+at that index in the fundamental sequence.
+`olim`: (**N** → **Ord**) → **Ord**
 
     let olim = λf z s l. l (λi. f i z s l);
 
-Finite numbers
-to_ord: N -> Ord
+Converting a Church integer to an ordinal integer is easy (again we optimize for bits):
+`to_ord`: **N** → **Ord**
 
     # let to_ord = λn. n osucc o0;
     let to_ord = λn z s l. n s z; # optimized
 
-o1, o2: Ord
+`o1`, `o2`: **Ord**
 
     let o1 = to_ord c1;
     let o2 = to_ord c2;
 
-ω: Ord
+The first infinite ordinal
+`ω`: **Ord**
 
     #let ω = olim to_ord; # Straightforward definition
     let ω = λz s l. l (λi. i s z); # Optimized definition
 
-For a continuous function, where α is a limit ordinal
-F(α)[n] = F(α[n])
-so l is just olim
-
-α + 0 = α, α + (β + 1) = (α + β) + 1
-
-oadd: Ord -> Ord -> Ord
-
+Almost all of the **Ord** → **Ord** functions we define here are continuous.
+Defining a continuous function is easy with this representation, just
+pass `olim` as the third argument. For example, ordinal addition (in which α + 0 = α,
+α + (β + 1) = (α + β) + 1) we define as
+`oadd`: **Ord** → **Ord** → **Ord**
 
     let oadd = λα β. β α osucc olim;
 
-C combinator, swap arguments to function
+At this point it's handy to define the [C
+combinator](https://en.wikipedia.org/wiki/B,_C,_K,_W_system) which swaps arguments:
+`C`: (**T** → **U** → **V**) → (**U** → **T** → **V**)
 
     let C = λf x y. f y x;
 
-α * 0 = 0, α * (β + 1) = (α * β) + α
-
-omul: Ord -> Ord -> Ord
+and use it to define ordinal multiplication α * 0 = 0, α * (β + 1) = (α * β) + α as
+`omul`: **Ord** → **Ord** → **Ord**
 
     let omul = λα β. β o0 (C oadd α) olim;
 
-α^0 = 1, α^{β + 1} = α^β * α
-
-opow: Ord -> Ord -> Ord
+and powers α^0 = 1, α^{β + 1} = α^β * α as
+`opow`: **Ord** → **Ord** → **Ord**
 
     let opow = λα β. β o1 (C omul α) olim;
 
-First fixed point of f >= α where f strictly increasing, continuous
-fixedp: (Ord -> Ord) -> Ord -> Ord
+With these we can define ordinals like ω^ω^ω + ω^ω2 + 4. To go further,
+we define an operator that takes fixed points, given a starting point *α* and a normal function
+*F*:
+`fixedp`: (**Ord** → **Ord**) → **Ord** → **Ord**
 
     let fixedp = λf α. olim λn. n f α;
 
-epsilon0: Ord
+which allows us to define
+`epsilon0`: **Ord**
 
     let epsilon0 = fixedp (opow ω) o0;
 
-stepfix (fixedp f) α = α'th fixed point of f
-stepfix: (Ord -> Ord) -> Ord -> Ord
-stepfix f o0 = f o0
-stepfix f (osucc α) = f (osucc (stepfix f α))
+If `f α` finds the least ordinal no less than `α` with some property, `stepfix` enumerates the
+solutions by ordinal (where this is continuous); to get the successor value, add one to the value
+you have and search again.
+`stepfix`: (**Ord** → **Ord**) → **Ord** → **Ord**
 
     let stepfix = λf α. α (f o0) (λp. f (osucc p)) olim;
 
-Derivative of f, enumerates solutions of x = f x
-deriv: (Ord -> Ord) -> (Ord -> Ord)
+Putting these together we can take derivatives.
+`deriv`: (**Ord** → **Ord**) → **Ord** → **Ord**
 
     let deriv = λf. stepfix (fixedp f);
 
-Two-argument Veblen function
-veblen2: Ord -> Ord -> Ord
+Two-argument [Veblen function](https://en.wikipedia.org/wiki/Veblen_function). Note the caution in
+Paul Budnik, [An overview of the ordinal
+calculator](https://www.mtnmath.com/ord/ordinalarith.pdf): "if the least significant parameter is a
+successor and the the next least significant parameter is a limit, one must exercise care to make
+sure both parameters affect the result" (thanks to [John
+Baez](https://twitter.com/ciphergoth/status/1234653144082042880)). For a limit ordinal γ, one
+cannot assume that φ\_γ(α + 1) = \\lim\_{β<γ} φ\_γ(α) and the rest of the paragraph we excerpt
+above includes a counterexample. Instead, one must explicitly find new fixed points for every
+function in the limit sequence, starting from the previous fixed point found for the whole limit
+function.
+`veblen2`: **Ord** → **Ord** → **Ord**
 
     let veblen2 = λα. α
         (opow ω)
         deriv
-        (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N -> Ord -> Ord
+        (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N → Ord → Ord
 
-[fast growing hierarchy](http://googology.wikia.com/wiki/Fast-growing_hierarchy)
-fgh: Ord -> N -> N
+By taking fixed points one more time, we can enumerate solutions of `x = veblen2 x o0` and thus
+define the Feferman-Schütte ordinal Γ\_0, or indeed Γ\_*α* for any *α*.
+`feferman_schuette`: **Ord** → **Ord**
+
+    let feferman_schuette = deriv (C veblen2 o0);
+
+Now that we have some ordinals, we can define the fast-growing hierarchy `fgh`: **Ord** → **N** → **N**
 
     let fgh = λ α. α csucc (λ f n. n f n) (λlf n. lf n n);
+
+And with that we're finally ready to write some programs which reduce to Church integers.
 
     let f_0 = fgh o0 c4;
     draw f_0;
@@ -138,14 +189,24 @@ fgh: Ord -> N -> N
     let f_e0 = fgh (osucc epsilon0) c4;
     draw f_e0;
 
-Enumerate solutions of x = veblen2 x o0
-
-    let feferman_schuette = deriv (C veblen2 o0);
-
-Finally, make a really big number out of all this :)
+But we didn't build all this just to define pocket calculator stuff like `fgh (osucc epsilon0) c4`.
+Let's use `feferman_schuette` to reference an ordinal outside the two-argument Veblen function,
+and feed that into the fast-growing hierarchy:
 
     let f_FS = fgh (osucc (feferman_schuette ω)) c3;
     draw f_FS;
+
+This is larger than many numbers on the [Googology
+Wiki](https://googology.wikia.org/wiki/Googology_Wiki); consider for example that [Graham's
+Number](https://googology.wikia.org/wiki/Graham%27s_number) is approximated there as
+`fgh (osucc omega) c64` (where of course `c64 = c3 c4`).
+
+We can of course go on to define larger ordinals like this and thus larger integers, but the next
+ordinal that is different in kind is the small Veblen ordinal, followed by the large Veblen
+ordinal. I haven't tried to define these because I don't fully understand them yet; there's room to
+express even vaster numbers with this system.
+
+## Copyright notice
 
 Copyright 2020 Google LLC
 
