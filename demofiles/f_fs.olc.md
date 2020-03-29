@@ -148,16 +148,22 @@ calculator](https://www.mtnmath.com/ord/ordinalarith.pdf): "if the least signifi
 successor and the the next least significant parameter is a limit, one must exercise care to make
 sure both parameters affect the result" (thanks to [John
 Baez](https://twitter.com/ciphergoth/status/1234653144082042880)). For a limit ordinal γ, one
-cannot assume that φ\_γ(α + 1) = \\lim\_{β<γ} φ\_γ(α) and the rest of the paragraph we excerpt
-above includes a counterexample. Instead, one must explicitly find new fixed points for every
+cannot assume that φ\_γ(α + 1) = \\lim\_{β<γ} φ\_γ(α); see this paper for a counterexample.
+Instead, one must explicitly find new fixed points for every
 function in the limit sequence, starting from the previous fixed point found for the whole limit
 function.
+
+Because this takes two arguments, it recursively builds an **Ord** → **Ord** function. At zero
+this function is just *x* → ω^*x*. The successor of each function is the derivative.
+For the limit, the variable `lf` in the lambda below is of type **N** → **Ord** → **Ord**,
+and we must return an **Ord** → **Ord**. Bearing in mind the above caution, we use `stepfix` to
+step through the limit fixed points.
 `veblen2`: **Ord** → **Ord** → **Ord**
 
     let veblen2 = λα. α
         (opow ω)
         deriv
-        (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N → Ord → Ord
+        λlf. stepfix λostart. olim λn. fixedp (lf n) ostart;
 
 By taking fixed points one more time, we can enumerate solutions of `x = veblen2 x o0` and thus
 define the Feferman-Schütte ordinal Γ\_0
@@ -200,10 +206,10 @@ Wiki](https://googology.wikia.org/wiki/Googology_Wiki); consider for example tha
 Number](https://googology.wikia.org/wiki/Graham%27s_number) is approximated there as
 `fgh (osucc omega) c64` (where of course `c64 = c3 c4`).
 
-We can of course go on to define larger ordinals like this and thus larger integers, but the next
-ordinal that is different in kind is the small Veblen ordinal, followed by the large Veblen
-ordinal. I haven't tried to define these because I don't fully understand them yet; there's room to
-express even vaster numbers with this system.
+We can of course go on to define larger ordinals like this (eg by taking derivatives)
+and thus larger integers, but the next ordinal that is different in kind is the small Veblen
+ordinal, followed by the large Veblen ordinal. I haven't tried to define these because I don't
+fully understand them yet; there's room to express even vaster numbers with this system.
 
 ## Copyright notice
 
