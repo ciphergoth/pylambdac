@@ -13,6 +13,6 @@ Install [poetry](https://python-poetry.org/), then try
     alias poetry='python3 $HOME/.poetry/bin/poetry'
 
     poetry update
-    poetry run ./trylambda --outdir=/tmp/out demofiles/*
+    poetry run ./olcrun --outdir=/tmp/out demofiles/*
 
 This is not an officially supported Google product.
