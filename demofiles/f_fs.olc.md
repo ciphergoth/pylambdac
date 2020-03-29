@@ -160,10 +160,10 @@ function.
         (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N → Ord → Ord
 
 By taking fixed points one more time, we can enumerate solutions of `x = veblen2 x o0` and thus
-define the Feferman-Schütte ordinal Γ\_0, or indeed Γ\_*α* for any *α*.
-`feferman_schuette`: **Ord** → **Ord**
+define the Feferman-Schütte ordinal Γ\_0
+`feferman_schuette`: **Ord**
 
-    let feferman_schuette = deriv (C veblen2 o0);
+    let feferman_schuette = deriv (C veblen2 o0) o0;
 
 Now that we have some ordinals, we can define the fast-growing hierarchy `fgh`: **Ord** → **N** → **N**
 
@@ -190,10 +190,9 @@ And with that we're finally ready to write some programs which reduce to Church 
     draw f_e0;
 
 But we didn't build all this just to define pocket calculator stuff like `fgh (osucc epsilon0) c4`.
-Let's use `feferman_schuette` to reference an ordinal outside the two-argument Veblen function,
-and feed that into the fast-growing hierarchy:
+Let's use our biggest ordinal so far, the Feferman-Schütte ordinal:
 
-    let f_FS = fgh (osucc (feferman_schuette ω)) c3;
+    let f_FS = fgh (osucc (osucc feferman_schuette)) c3;
     draw f_FS;
 
 This is larger than many numbers on the [Googology
