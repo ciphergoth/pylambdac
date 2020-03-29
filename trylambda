@@ -16,78 +16,9 @@
 import argparse
 import pathlib
 
-from pylambdac import draw
-from pylambdac import lterm
 from pylambdac import markcode
 from pylambdac import parse
-
-def flatten_symbols(name, symbols):
-    expr = symbols[name]
-    while True:
-        free = expr.variables(True)
-        if not free:
-            #print(f"flat: {expr}")
-            return expr
-        #print(f"flattening {expr}")
-        subst = None
-        for p in symbols.items():
-            if p[0] in free:
-                subst = p
-        if subst == None:
-            print(f"Defies flattening: {expr}")
-            print(f"Free variables: {free}")
-            return None
-        if subst[0] in subst[1].variables(True):
-            print(f"Recursive: {expr}")
-            return None
-        #print(f"substituting {subst[0]} = {subst[1]}")
-        expr = lterm.Apply(lterm.Lambda(subst[0], expr), subst[1])
-
-def optimize(expr):
-    while True:
-        newexpr = expr.optimize()
-        if newexpr is None:
-            return expr
-        expr = newexpr
-        print(f"optimized: {expr}")
-
-class Processor:
-    def __init__(self, args):
-        self._args = args
-        self._symbols = {}
-
-    def do_let(self, name, value):
-        print(f"let {name.value} = {value}")
-        assert name.value not in self._symbols
-        self._symbols[name.value] = value
-
-    def do_magic(self, name):
-        print(f"magic {name.value}")
-        assert name.value not in self._symbols
-        self._symbols[name.value] = lterm.get_magic(name.value)
-
-    def do_reduce(self, expr):
-        print(f"reduce {expr}")
-        while True:
-            print("    ", expr)
-            next = expr.reduce_once(self._symbols)
-            if next is None:
-                print()
-                return
-            expr = next
-
-    def do_draw(self, name):
-        print(f"draw {name}")
-        expr = flatten_symbols(name, self._symbols)
-        if expr is None:
-            return
-        print(f"flattened: {expr}")
-        expr = optimize(expr)
-        draw.draw_expr(3, expr).print()
-        print(f"{expr.size()} bits")
-        if self._args.outdir:
-            self._args.outdir.mkdir(parents=True, exist_ok=True)
-            draw.draw_expr(4, expr).write_image(self._args.outdir / f"{name}.png")
+import pylambdac.processor
 
 def file_text(tf):
     if tf.suffix == ".md":
@@ -99,9 +30,7 @@ def file_text(tf):
 def try_file(tf, args):
     print(f"==== {tf}")
     directives = parse.parse_directives(file_text(tf))
-    processor = Processor(args)
-    for directive in directives.children:
-        getattr(processor, f"do_{directive.data}")(*directive.children)
+    pylambdac.processor.process(args, directives)
 
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
