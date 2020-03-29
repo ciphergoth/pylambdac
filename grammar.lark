@@ -15,7 +15,7 @@
 directives: (directive ";")*
 ?directive: let | magic | reduce | draw
 let: "let" VARWORD "=" expr
-magic: "magic" VARWORD VARWORD
+magic: "magic" VARWORD
 reduce: "reduce" expr
 draw: "draw" VARWORD
 

@@ -61,10 +61,10 @@ class Processor:
         assert name.value not in self._symbols
         self._symbols[name.value] = value
 
-    def do_magic(self, name, mtype):
-        print(f"magic {name.value} {mtype.value}")
+    def do_magic(self, name):
+        print(f"magic {name.value}")
         assert name.value not in self._symbols
-        self._symbols[name.value] = lterm.get_magic(name.value, mtype.value)
+        self._symbols[name.value] = lterm.get_magic(name.value)
 
     def do_reduce(self, expr):
         print(f"reduce {expr}")

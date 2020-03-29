@@ -330,6 +330,6 @@ class MagicEager(Magic):
             return None
         return Apply(self, rd)
 
-def get_magic(name, type):
+def get_magic(name):
     m = {"Y": MagicY, "eager": MagicEager}
-    return m[type](name)
+    return m[name](name)

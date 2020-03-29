@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-magic Y Y;
+magic Y;
 let K = λx y. x;
 
 # [a b c] parses to (cons a (cons b (cons c nil)))
