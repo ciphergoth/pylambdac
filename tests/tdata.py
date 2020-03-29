@@ -29,7 +29,7 @@ class Test:
 
 class Tdata(Test):
     def file(self):
-        return paths.top / "testdata" / (f"test_{self.name}.json")
+        return paths.top / "tests/testdata" / (f"test_{self.name}.json")
 
     def read(self):
         return read_json(self.file())

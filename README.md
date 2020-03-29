@@ -4,6 +4,7 @@ Python tools for lambda calculus.
 
 ##  Why?
 
+This is not an officially supported Google product.
 This is not meant for some serious end; it's a toy to explore something I've been thinking about.
 
 In order to define new [very large
@@ -23,7 +24,7 @@ original.
 
 ## `olcrun`
 
-`olcrun` interprets `.olc` files such  as those in the [`demofiles`](demofiles) directory.
+`olcrun` interprets `.olc` files such  as those in the [`demofiles`](demofiles/) directory.
 
 Install [poetry](https://python-poetry.org/), then try
 
@@ -35,7 +36,7 @@ Install [poetry](https://python-poetry.org/), then try
 If the file ends in `.md`, the file is parsed as Markdown, the blockcode parts are extracted,
 and this is then parsed as before. It's a very cheap and dirty form of literate programming :)
 
-`.olc` files support the following directives ([grammar](grammar.lark)):
+`.olc` files support the following directives ([grammar](pylambdac/grammar.lark)):
 
 ### `let`
 
@@ -64,7 +65,7 @@ is equivalent to the Church integer 3, then `reduce n eager term;` reduces to
 ### `draw`
 
 `draw `*`variable`* draws a [Tromp diagram](https://tromp.github.io/cl/diagrams.html) of the
-expression named by the variable. Before drawing, free variables are substitutedfor their `let`
+expression named by the variable. Before drawing, free variables are substituted for their `let`
 values, and beta reductions are performed wherever they reduce the size of the expression.
 Finally the size of the expression in bits, represented using [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html), is printed.
 
@@ -74,4 +75,10 @@ will additionally write the drawings as `.png` files to the directory named.
 
 `draw` will fail if the expression contains undefined or "magic" names.
 
-This is not an officially supported Google product.
+## Testing
+
+To run tests, use `poetry run ./tests/run_tests`.
+
+Each file in the [`tests/testdata`](tests/testdata/) directory contains a list of question/answer pairs.  To
+guard against regressions, the `poetry run ./tests/rewrite_test` tool can be used to replace the
+answers in such a file with the answers that the current version of the software generates.

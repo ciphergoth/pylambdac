@@ -13,12 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
+import pathlib
+import sys
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
+
 from tests import all_tests
 
+def parse_args():
+    p = argparse.ArgumentParser(allow_abbrev=False)
+    p.add_argument("--test", required=True)
+    p.add_argument("--source",type=pathlib.Path, required=True)
+    return p.parse_args()
+
 def main():
-    for name, inst in all_tests.all_tests().items():
-        print(f"==== {name}")
-        inst.check_all()
+    args = parse_args()
+    all_tests.all_tests()[args.test].fixup_file(args.source)
 
 if __name__ == '__main__':
     main()

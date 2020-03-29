@@ -17,7 +17,7 @@ import lark
 from pylambdac import lterm
 from pylambdac import paths
 
-grammar = (paths.top / "grammar.lark").read_text()
+grammar = (paths.top / "pylambdac/grammar.lark").read_text()
 expr_parser = lark.Lark(grammar, start='expr', parser='lalr')
 directives_parser = lark.Lark(grammar, start='directives', parser='lalr')
 
