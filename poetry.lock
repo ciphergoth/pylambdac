@@ -4,7 +4,7 @@ description = "a modern parsing library"
 name = "lark-parser"
 optional = false
 python-versions = "*"
-version = "0.8.2"
+version = "0.8.5"
 
 [[package]]
 category = "main"
@@ -28,8 +28,8 @@ python-versions = "^3.7"
 
 [metadata.files]
 lark-parser = [
-    {file = "lark-parser-0.8.2.tar.gz", hash = "sha256:78d1e293a1fb06f10373552af95f70832e2bfe19aebfc3b142ea6c03b2ea0597"},
-    {file = "lark_parser-0.8.2-py2.py3-none-any.whl", hash = "sha256:9d9ce33f36f749211194823a1175a76e2ccabccdfb86a196cefb967914122cd7"},
+    {file = "lark-parser-0.8.5.tar.gz", hash = "sha256:e3ee17708e310de3a832a9beb448aa60ab6812f1bb283f72d473584c7566cc74"},
+    {file = "lark_parser-0.8.5-py2.py3-none-any.whl", hash = "sha256:157879e04628e8e2bd57b72f3ba5642b3919137d5f7058612e95a38fb8761fa7"},
 ]
 mistletoe = [
     {file = "mistletoe-0.7.2-py3-none-any.whl", hash = "sha256:3e2d31b2fa6231ea2ee46981274ebac8d5e5736e3aad2d1cd449e2c053b7023b"},
