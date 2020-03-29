@@ -16,7 +16,10 @@ calculus](https://en.wikipedia.org/wiki/Lambda_calculus) is an appealing choice 
 This also has the advantage of a convenient and attractive visual representation in the form
 of a Tromp diagram.
 
-[A detailed description of the largest number defined](demofiles/f_fs.olc.md).
+For an example application, see this [detailed description of the largest number
+defined](demofiles/f_fs.olc.md). This also describes a clean and convenient method for
+representing computable countable ordinals with fundamental sequences which as far as I know is
+original.
 
 ## `olcrun`
 
