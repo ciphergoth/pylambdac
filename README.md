@@ -2,6 +2,8 @@
 
 Python tools for lambda calculus.
 
+![](imgs/graham.png)
+
 ##  Why?
 
 This is not an officially supported Google product.
@@ -21,6 +23,8 @@ For an example application, see this [detailed description of the largest number
 defined](demofiles/f_fs.olc.md). This also describes a clean and convenient method for
 representing computable countable ordinals with fundamental sequences which as far as I know is
 original.
+
+More output from this program [on my blog](https://mindsarentmagic.org/2020/02/24/some-more-numbers-as-lambda-calculus/).
 
 ## `olcrun`
 
