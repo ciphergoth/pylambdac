@@ -29,6 +29,8 @@ let c2 = csucc c1;
 let c3 = csucc c2;
 let cadd = λa b f x. (a f) ((b f) x);
 
+# Older, clunkier way of defining ordinals, before I discovered the method in f_fs.olc.md
+
 let o0 = λa b c. a;
 let osucc = λo a b c. b o;
 let o1 = osucc o0;

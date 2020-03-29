@@ -40,21 +40,21 @@ in lambda calculus if we add a way of handling limits.
 For this we ask for a function *l* such that where *α* is a limit ordinal,
 *F*(*α*) = *l*(λ*i*. *F*(*α*[*i*])); in other words, we hand *l* a function
 that maps integers to *F* applied to that index in the limit sequence. Thus
-an ordinal *α* is a function which takes these three parameters *z*, *s*, *l*,
-and returns *F*(*α*) ie `α z s l` = *F*(*α*).
+an ordinal *α* is a function which takes these three parameters *l*, *s*, *z*,
+and returns *F*(*α*) ie `α l s z` = *F*(*α*).
 
 Let's call the type of computable countable ordinals with fundamental
 sequences **Ord**, and suppose *F* is a function which takes an ordinal
 and returns some type **T**. Then the three parts we'll use to represent *F*
 have types:
 
-* *z*: **T**
-* *s*: **T** → **T**
 * *l*: (**N** → **T**) → **T**
+* *s*: **T** → **T**
+* *z*: **T**
 
 and the type **Ord** takes one of each:
 
-* **Ord** = **T** → (**T** → **T**) → ((**N** → **T**) → **T**) → **T**
+* **Ord** = ((**N** → **T**) → **T**) → (**T** → **T**) → **T** → **T**
 
 Note that "**A** → **B** → **C**" should be interpreted as
 "**A** → (**B** → **C**)" as per the usual convention for representing
@@ -64,24 +64,24 @@ multi-argument functions in the lambda calculus; see also
 Ordinal zero
 `o0`: **Ord**
 
-    let o0 = λz s l. z;
+    let o0 = λl s z. z;
 
 Ordinal successor
 `osucc`: **Ord** → **Ord**
 
-    let osucc = λα z s l. s (α z s l);
+    let osucc = λα l s z. s (α l s z);
 
 We define limits using a function which takes an index and returns the ordinal
 at that index in the fundamental sequence.
 `olim`: (**N** → **Ord**) → **Ord**
 
-    let olim = λf z s l. l (λi. f i z s l);
+    let olim = λf l s z. l (λi. f i l s z);
 
 Converting a Church integer to an ordinal integer is easy (again we optimize for bits):
 `to_ord`: **N** → **Ord**
 
     # let to_ord = λn. n osucc o0;
-    let to_ord = λn z s l. n s z; # optimized
+    let to_ord = λn l. n; # optimized
 
 `o1`, `o2`: **Ord**
 
@@ -92,31 +92,29 @@ The first infinite ordinal
 `ω`: **Ord**
 
     #let ω = olim to_ord; # Straightforward definition
-    let ω = λz s l. l (λi. i s z); # Optimized definition
+    let ω = λl s z. l (λi. i s z); # Optimized definition
+
+Next we need ordinal arithmetic. We reverse the arguments of our ordinal arithmetic functions
+so that partial application is more useful.
 
 Almost all of the **Ord** → **Ord** functions we define here are continuous.
 Defining a continuous function is easy with this representation, just
-pass `olim` as the third argument. For example, ordinal addition (in which α + 0 = α,
+pass `olim` as the first argument. For example, ordinal addition (in which α + 0 = α,
 α + (β + 1) = (α + β) + 1) we define as
 `oadd`: **Ord** → **Ord** → **Ord**
 
-    let oadd = λα β. β α osucc olim;
+    # let oadd = λβ α. β olim osucc α;
+    let oadd = λβ. β olim osucc; # Optimized
 
-At this point it's handy to define the [C
-combinator](https://en.wikipedia.org/wiki/B,_C,_K,_W_system) which swaps arguments:
-`C`: (**T** → **U** → **V**) → (**U** → **T** → **V**)
-
-    let C = λf x y. f y x;
-
-and use it to define ordinal multiplication α * 0 = 0, α * (β + 1) = (α * β) + α as
+Ordinal multiplication α * 0 = 0, α * (β + 1) = (α * β) + α as
 `omul`: **Ord** → **Ord** → **Ord**
 
-    let omul = λα β. β o0 (C oadd α) olim;
+    let omul = λβ α. β olim (oadd α) o0;
 
 and powers α^0 = 1, α^{β + 1} = α^β * α as
 `opow`: **Ord** → **Ord** → **Ord**
 
-    let opow = λα β. β o1 (C omul α) olim;
+    let opow = λβ α. β olim (omul α) o1;
 
 With these we can define ordinals like ω^ω^ω + ω^ω2 + 4. To go further,
 we define an operator that takes fixed points, given a starting point *α* and a normal function
@@ -125,17 +123,23 @@ we define an operator that takes fixed points, given a starting point *α* and a
 
     let fixedp = λf α. olim λn. n f α;
 
+At this point it's handy to define the [C
+combinator](https://en.wikipedia.org/wiki/B,_C,_K,_W_system) which swaps arguments:
+`C`: (**T** → **U** → **V**) → (**U** → **T** → **V**)
+
+        let C = λf x y. f y x;
+
 which allows us to define
 `epsilon0`: **Ord**
 
-    let epsilon0 = fixedp (opow ω) o0;
+    let epsilon0 = fixedp (C opow ω) o0;
 
 If `f α` finds the least ordinal no less than `α` with some property, `stepfix` enumerates the
 solutions by ordinal (where this is continuous); to get the successor value, add one to the value
 you have and search again.
 `stepfix`: (**Ord** → **Ord**) → **Ord** → **Ord**
 
-    let stepfix = λf α. α (f o0) (λp. f (osucc p)) olim;
+    let stepfix = λf α. α olim (λp. f (osucc p)) (f o0);
 
 Putting these together we can take derivatives.
 `deriv`: (**Ord** → **Ord**) → **Ord** → **Ord**
@@ -161,9 +165,9 @@ step through the limit fixed points.
 `veblen2`: **Ord** → **Ord** → **Ord**
 
     let veblen2 = λα. α
-        (opow ω)
+        (λlf. stepfix λostart. olim λn. fixedp (lf n) ostart)
         deriv
-        λlf. stepfix λostart. olim λn. fixedp (lf n) ostart;
+        (C opow ω);
 
 By taking fixed points one more time, we can enumerate solutions of `x = veblen2 x o0` and thus
 define the Feferman-Schütte ordinal Γ\_0
@@ -173,7 +177,7 @@ define the Feferman-Schütte ordinal Γ\_0
 
 Now that we have some ordinals, we can define the fast-growing hierarchy `fgh`: **Ord** → **N** → **N**
 
-    let fgh = λ α. α csucc (λ f n. n f n) (λlf n. lf n n);
+    let fgh = λ α. α (λlf n. lf n n) (λ f n. n f n) csucc;
 
 And with that we're finally ready to write some programs which reduce to Church integers.
 
