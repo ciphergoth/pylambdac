@@ -115,7 +115,7 @@ veblen2: Ord -> Ord -> Ord
         deriv
         (λlf. stepfix (λostart. olim λn. fixedp (lf n) ostart)); # lf: N -> Ord -> Ord
 
-fast-growing hierarchy
+[fast growing hierarchy](http://googology.wikia.com/wiki/Fast-growing_hierarchy)
 fgh: Ord -> N -> N
 
     let fgh = λ α. α csucc (λ f n. n f n) (λlf n. lf n n);
