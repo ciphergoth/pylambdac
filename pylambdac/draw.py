@@ -23,8 +23,12 @@ class Grid:
         self.dwg = svgwrite.Drawing(
             size=size,
             fill="black")
-        self.g = self.dwg.g(transform=f"scale({scale}) translate(1 1)")
-        self.dwg.add(self.g)
+        g = self.dwg.g(transform=f"scale({scale}) translate(1 1)")
+        self.dwg.add(g)
+        self.g = self.dwg.g()
+        g.add(self.g)
+        self.textg = self.dwg.g(fill="white", font_family="Verdana", font_size="1")
+        g.add(self.textg)
 
     def drawh(self, r, cstart, cend):
         self.g.add(self.dwg.rect(
@@ -37,6 +41,8 @@ class Grid:
             size=((cend - cstart) * 4 + 3, 1))
         rect.set_desc(title=name)
         self.g.add(rect)
+        self.textg.add(self.dwg.text(name,
+            insert=(cstart * 4, r * self.rstep + 0.9)))
 
     def drawv(self, rstart, rend, c):
         self.g.add(self.dwg.rect(
