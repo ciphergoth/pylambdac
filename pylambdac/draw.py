@@ -15,35 +15,39 @@
 import svgwrite
 
 class Grid:
-    def __init__(self, rstep, h, w):
+    def __init__(self, scale, rstep, h, w):
         self.rstep = rstep
         self.h = h
         self.w = w
-        self.dwg = svgwrite.Drawing(size=((w * 4 - 1, (h - 1) * rstep + 1)),
+        size = ((w * 4 + 1) * scale, ((h - 1) * rstep + 3) * scale)
+        self.dwg = svgwrite.Drawing(
+            size=size,
             fill="black")
+        self.g = self.dwg.g(transform=f"scale({scale}) translate(1 1)")
+        self.dwg.add(self.g)
 
     def drawh(self, r, cstart, cend):
-        self.dwg.add(self.dwg.rect(
+        self.g.add(self.dwg.rect(
             insert=(cstart * 4 + 1, r * self.rstep),
             size=((cend - cstart) * 4 + 1, 1)))
 
     def drawl(self, r, cstart, cend):
-        self.dwg.add(self.dwg.rect(
+        self.g.add(self.dwg.rect(
             insert=(cstart * 4, r * self.rstep),
             size=((cend - cstart) * 4 + 3, 1)))
 
     def drawv(self, rstart, rend, c):
-        self.dwg.add(self.dwg.rect(
+        self.g.add(self.dwg.rect(
             insert=(c * 4 + 1, rstart * self.rstep),
             size=(1, (rend - rstart) * 4 + 1)))
 
-    def write_image(self, outfile, factor=10):
+    def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
 
 def draw_expr(rstep, expr):
     h, w = expr.draw_dims[0:2]
     if w == 1:
         h += 1
-    grid = Grid(rstep, h, w)
+    grid = Grid(10, rstep, h, w)
     expr.draw(grid, 0, 0, {})
     return grid
