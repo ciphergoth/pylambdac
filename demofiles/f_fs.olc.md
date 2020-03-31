@@ -128,11 +128,13 @@ combinator](https://en.wikipedia.org/wiki/B,_C,_K,_W_system) which swaps argumen
 `C`: (**T** → **U** → **V**) → (**U** → **T** → **V**)
 
         let C = λf x y. f y x;
+        let omegapow = C opow ω;
+        draw omegapow;
 
 which allows us to define
 `epsilon0`: **Ord**
 
-    let epsilon0 = fixedp (C opow ω) o0;
+    let epsilon0 = fixedp omegapow o0;
 
 If `f α` finds the least ordinal no less than `α` with some property, `stepfix` enumerates the
 solutions by ordinal (where this is continuous); to get the successor value, add one to the value
@@ -167,7 +169,7 @@ step through the limit fixed points.
     let veblen2 = λα. α
         (λlf. stepfix λostart. olim λn. fixedp (lf n) ostart)
         deriv
-        (C opow ω);
+        omegapow;
 
 By taking fixed points one more time, we can enumerate solutions of `x = veblen2 x o0` and thus
 define the Feferman-Schütte ordinal Γ\_0
