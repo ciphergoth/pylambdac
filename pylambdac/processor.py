@@ -57,17 +57,19 @@ class Processor:
             expr = next
 
     def do_draw(self, name):
+        if self._args.outdir is None:
+            print(f"draw {name} # no --outdir specified, not drawing")
+            return
         print(f"draw {name}")
         expr = flatten_symbols(name, self._symbols)
         if expr is None:
             return
         print(f"flattened: {expr}")
         expr = optimize(expr)
-        draw.draw_expr(3, expr).print()
-        print(f"{expr.size()} bits")
-        if self._args.outdir:
-            self._args.outdir.mkdir(parents=True, exist_ok=True)
-            draw.draw_expr(4, expr).write_image(self._args.outdir / f"{name}.png")
+        self._args.outdir.mkdir(parents=True, exist_ok=True)
+        target = self._args.outdir / f"{name}.png"
+        draw.draw_expr(4, expr).write_image(target)
+        print(f"Expression of {expr.size()} BLC bits saved to {target}")
 
 def process(args, directives):
     processor = Processor(args)

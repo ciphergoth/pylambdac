@@ -39,15 +39,10 @@ class Grid:
             ((c * 4 + 1, rstart * self.rstep),
             (c * 4 + 1, rend * self.rstep)), 0)
 
-    def print(self):
-        for r in range(self.image.height):
-            print("".join("# "[self.image.getpixel((c, r))] for c in range(self.image.width)))
-
     def write_image(self, outfile, factor=10):
         image = PIL.ImageOps.expand(self.image, border=1, fill=1)
         image = PIL.ImageOps.scale(image, factor, resample=PIL.Image.NEAREST)
         image.save(outfile)
-        print(f"Saved to {outfile}")
 
 def draw_expr(rstep, expr):
     h, w = expr.draw_dims[0:2]
