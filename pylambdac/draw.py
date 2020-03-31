@@ -12,37 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import PIL.Image
-import PIL.ImageDraw
-import PIL.ImageOps
+import svgwrite
 
 class Grid:
     def __init__(self, rstep, h, w):
         self.rstep = rstep
         self.h = h
         self.w = w
-        self.image = PIL.Image.new("1", (w * 4 - 1, (h - 1) * rstep + 1), 1)
-        self.draw = PIL.ImageDraw.Draw(self.image)
+        self.dwg = svgwrite.Drawing(size=((w * 4 - 1, (h - 1) * rstep + 1)),
+            fill="black")
 
     def drawh(self, r, cstart, cend):
-        self.draw.rectangle(
-            ((cstart * 4 + 1, r * self.rstep),
-            (cend * 4 + 1, r * self.rstep)), 0)
+        self.dwg.add(self.dwg.rect(
+            insert=(cstart * 4 + 1, r * self.rstep),
+            size=((cend - cstart) * 4 + 1, 1)))
 
     def drawl(self, r, cstart, cend):
-        self.draw.rectangle(
-            ((cstart * 4, r * self.rstep),
-            (cend * 4 + 2, r * self.rstep)), 0)
+        self.dwg.add(self.dwg.rect(
+            insert=(cstart * 4, r * self.rstep),
+            size=((cend - cstart) * 4 + 3, 1)))
 
     def drawv(self, rstart, rend, c):
-        self.draw.rectangle(
-            ((c * 4 + 1, rstart * self.rstep),
-            (c * 4 + 1, rend * self.rstep)), 0)
+        self.dwg.add(self.dwg.rect(
+            insert=(c * 4 + 1, rstart * self.rstep),
+            size=(1, (rend - rstart) * 4 + 1)))
 
     def write_image(self, outfile, factor=10):
-        image = PIL.ImageOps.expand(self.image, border=1, fill=1)
-        image = PIL.ImageOps.scale(image, factor, resample=PIL.Image.NEAREST)
-        image.save(outfile)
+        self.dwg.saveas(outfile, pretty=True)
 
 def draw_expr(rstep, expr):
     h, w = expr.draw_dims[0:2]

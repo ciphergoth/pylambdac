@@ -67,7 +67,7 @@ class Processor:
         print(f"flattened: {expr}")
         expr = optimize(expr)
         self._args.outdir.mkdir(parents=True, exist_ok=True)
-        target = self._args.outdir / f"{name}.png"
+        target = self._args.outdir / f"{name}.svg"
         draw.draw_expr(4, expr).write_image(target)
         print(f"Expression of {expr.size()} BLC bits saved to {target}")
 
