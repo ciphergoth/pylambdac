@@ -43,7 +43,8 @@ def main():
         processor.process(directives)
         drawings.extend(processor.drawings)
     if args.outdir:
-        body = "\n".join(f"<p><img src=\"{d}\"/></p>" for d in drawings)
+        body = "\n".join(
+            f"<figure><img src=\"{d}\"/><figcaption>{d}</figcaption></figure>" for d in drawings)
         (args.outdir / "index.html").write_text(
             f"<html><body>{body}</body></html>")
 
