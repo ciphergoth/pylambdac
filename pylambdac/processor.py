@@ -35,6 +35,7 @@ class Processor:
     def __init__(self, args):
         self._args = args
         self._symbols = {}
+        self.drawings = []
 
     def do_let(self, name, value):
         print(f"let {name.value} = {value}")
@@ -67,11 +68,11 @@ class Processor:
         print(f"flattened: {expr}")
         expr = optimize(expr)
         self._args.outdir.mkdir(parents=True, exist_ok=True)
-        target = self._args.outdir / f"{name}.svg"
-        draw.draw_expr(4, expr).write_image(target)
+        target = f"{name}.svg"
+        draw.draw_expr(4, expr).write_image(self._args.outdir / target)
         print(f"Expression of {expr.size()} BLC bits saved to {target}")
+        self.drawings.append(target)
 
-def process(args, directives):
-    processor = Processor(args)
-    for directive in directives.children:
-        getattr(processor, f"do_{directive.data}")(*directive.children)
+    def process(self, directives):
+        for directive in directives.children:
+            getattr(self, f"do_{directive.data}")(*directive.children)

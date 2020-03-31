@@ -27,11 +27,6 @@ def file_text(tf):
     else:
         return tf.read_text()
 
-def try_file(tf, args):
-    print(f"==== {tf}")
-    directives = parse.parse_directives(file_text(tf))
-    pylambdac.processor.process(args, directives)
-
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
     p.add_argument("--outdir", type=pathlib.Path)
@@ -40,8 +35,17 @@ def parse_args():
 
 def main():
     args = parse_args()
+    drawings = []
     for tf in args.olcfile:
-        try_file(tf, args)
+        print(f"==== {tf}")
+        directives = parse.parse_directives(file_text(tf))
+        processor = pylambdac.processor.Processor(args)
+        processor.process(directives)
+        drawings.extend(processor.drawings)
+    if args.outdir:
+        body = "\n".join(f"<p><img src=\"{d}\"/></p>" for d in drawings)
+        (args.outdir / "index.html").write_text(
+            f"<html><body>{body}</body></html>")
 
 if __name__ == '__main__':
     main()
