@@ -273,11 +273,11 @@ class Lambda(Term):
             yield from self.e._variables(free)
 
     def draw(self, grid, ro, co, ll):
-        grid.drawl(ro, co, co + self.draw_dims[1] -1)
         old = ll.get(self.v, None)
         ll[self.v] = ro
         self.e.draw(grid, ro + 1, co, ll)
         ll[self.v] = old
+        grid.drawl(ro, co, co + self.draw_dims[1] -1, self.v)
 
     def _size(self, names):
         with names.add(self.v):

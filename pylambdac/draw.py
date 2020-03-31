@@ -28,18 +28,20 @@ class Grid:
 
     def drawh(self, r, cstart, cend):
         self.g.add(self.dwg.rect(
-            insert=(cstart * 4 + 1, r * self.rstep),
-            size=((cend - cstart) * 4 + 1, 1)))
+            insert=(cstart * 4 + 2, r * self.rstep),
+            size=((cend - cstart) * 4 - 1, 1)))
 
-    def drawl(self, r, cstart, cend):
-        self.g.add(self.dwg.rect(
+    def drawl(self, r, cstart, cend, name):
+        rect = self.dwg.rect(
             insert=(cstart * 4, r * self.rstep),
-            size=((cend - cstart) * 4 + 3, 1)))
+            size=((cend - cstart) * 4 + 3, 1))
+        rect.set_desc(title=name)
+        self.g.add(rect)
 
     def drawv(self, rstart, rend, c):
         self.g.add(self.dwg.rect(
-            insert=(c * 4 + 1, rstart * self.rstep),
-            size=(1, (rend - rstart) * 4 + 1)))
+            insert=(c * 4 + 1, rstart * self.rstep + 1),
+            size=(1, (rend - rstart) * 4)))
 
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
