@@ -15,6 +15,30 @@
 import svgwrite
 
 class Grid:
+    def drawfl(self, rstart, rend, cstart, cend):
+        self.drawv(rstart, rend, cstart)
+        self.drawh(rend, cstart, cend)
+
+    def drawbl(self, rstart, rend, cstart, cend):
+        self.drawh(rend, cstart, cend)
+        self.drawv(rstart, rend, cend)
+
+    def drawu(self, rstart, rend, rback, cstart, cend):
+        self.drawv(rstart, rend, cstart)
+        self.drawh(rend, cstart, cend)
+        self.drawv(rback, rend, cend)
+
+class NullGrid(Grid):
+    def drawh(self, r, cstart, cend):
+        pass
+
+    def drawl(self, r, cstart, cend, name):
+        pass
+
+    def drawv(self, rstart, rend, c):
+        pass
+
+class SvgGrid(Grid):
     def __init__(self, scale, rstep, h, w):
         self.rstep = rstep
         self.h = h
@@ -53,9 +77,11 @@ class Grid:
         self.dwg.saveas(outfile, pretty=True)
 
 def draw_expr(rstep, expr):
-    h, w = expr.draw_dims[0:2]
-    if w == 1:
-        h += 1
-    grid = Grid(10, rstep, h, w)
-    expr.draw(grid, 0, 0, {})
+    ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)
+    assert leftover is None
+    grid = SvgGrid(10, rstep, h, w)
+    ((r, c), leftover) = expr.draw(grid, {}, None, 0, 0)
+    assert leftover is None
+    assert h == r
+    assert w == c
     return grid

@@ -128,7 +128,6 @@ class Term:
 class Var(Term):
     def __init__(self, name):
         self.name = name
-        self.draw_dims = (0, 1, 0, 0)
 
     def _str(self, bracketa, bracketl):
         yield self.name
@@ -154,8 +153,12 @@ class Var(Term):
     def _variables(self, free):
         yield self.name
 
-    def draw(self, grid, ro, co, ll):
-        grid.drawv(ll[self.name], ro, co)
+    def draw(self, grid, ll, toleave, ro, co):
+        if toleave is None:
+            grid.drawv(ll[self.name], ro, co)
+            return ((ro + 1, co + 1), None)
+        else:
+            return ((ro, co + 1), (ll[self.name], co))
 
     def _size(self, names):
         return 2 + names.search(self.name)
@@ -164,9 +167,6 @@ class Apply(Term):
     def __init__(self, a, b):
         self.a = a
         self.b = b
-        ls = a.draw_dims
-        rs = b.draw_dims
-        self.draw_dims = (max(ls[0], rs[0]) + 1, ls[1] + rs[1], ls[3], ls[1] + rs[2])
 
     def _str(self, bracketa, bracketl):
         if bracketa:
@@ -199,12 +199,19 @@ class Apply(Term):
         yield from self.a._variables(free)
         yield from self.b._variables(free)
 
-    def draw(self, grid, ro, co, ll):
-        self.a.draw(grid, ro, co, ll)
-        self.b.draw(grid, ro, co + self.a.draw_dims[1], ll)
-        grid.drawv(ro + self.a.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[2])
-        grid.drawh(ro + self.draw_dims[0] -1, co + self.draw_dims[2], co + self.draw_dims[3])
-        grid.drawv(ro + self.b.draw_dims[0] -1, ro + self.draw_dims[0] -1, co + self.draw_dims[3])
+    def draw(self, grid, ll, toleave, ro, co):
+        ((l_r, l_c), (l_over_r, l_over_c)) = self.a.draw(grid, ll, "R", ro, co)
+        ((r_r, r_c), (r_over_r, r_over_c)) = self.b.draw(grid, ll, "L", ro, l_c)
+        bot = max(l_r, r_r)
+        if toleave == "L":
+            grid.drawbl(r_over_r, bot, l_over_c, r_over_c)
+            return ((bot + 1, r_c), (l_over_r, l_over_c))
+        elif toleave == "R":
+            grid.drawfl(l_over_r, bot, l_over_c, r_over_c)
+            return ((bot + 1, r_c), (r_over_r, r_over_c))
+        else:
+            grid.drawu(l_over_r, bot, r_over_r, l_over_c, r_over_c)
+            return ((bot + 1, r_c), None)
 
     def _size(self, names):
         return 2 + self.a._size(names) + self.b._size(names)
@@ -226,8 +233,6 @@ class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
         self.e = e
-        s = e.draw_dims
-        self.draw_dims = (s[0] + 1, s[1], s[2], s[3])
 
     def _rolllambda(self, vars):
         vars.append(self.v)
@@ -272,12 +277,13 @@ class Lambda(Term):
             yield self.v
             yield from self.e._variables(free)
 
-    def draw(self, grid, ro, co, ll):
+    def draw(self, grid, ll, toleave, ro, co):
         old = ll.get(self.v, None)
         ll[self.v] = ro
-        self.e.draw(grid, ro + 1, co, ll)
+        ((e_r, e_c), leftover) = self.e.draw(grid, ll, toleave, ro + 1, co)
         ll[self.v] = old
-        grid.drawl(ro, co, co + self.draw_dims[1] -1, self.v)
+        grid.drawl(ro, co, e_c - 1, self.v)
+        return ((e_r, e_c), leftover)
 
     def _size(self, names):
         with names.add(self.v):
