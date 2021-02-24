@@ -69,7 +69,7 @@ class Processor:
         expr = optimize(expr)
         self._args.outdir.mkdir(parents=True, exist_ok=True)
         target = f"{name}.svg"
-        draw.draw_expr(4, expr).write_image(self._args.outdir / target)
+        draw.draw_expr(expr).write_image(self._args.outdir / target)
         print(f"Expression of {expr.size()} BLC bits saved to {target}")
         self.drawings.append(target)
 

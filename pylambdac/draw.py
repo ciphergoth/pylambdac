@@ -14,72 +14,68 @@
 
 import svgwrite
 
-class Grid:
+class NullGrid:
+    def drawl(self, r, cstart, cend, name):
+        pass
+
+    def drawv(self, rstart, rend, c):
+        pass
+
     def drawfl(self, rstart, rend, cstart, cend):
-        self.drawv(rstart, rend, cstart)
-        self.drawh(rend, cstart, cend)
+        pass
 
     def drawbl(self, rstart, rend, cstart, cend):
-        self.drawh(rend, cstart, cend)
-        self.drawv(rstart, rend, cend)
+        pass
 
     def drawu(self, rstart, rend, rback, cstart, cend):
-        self.drawv(rstart, rend, cstart)
-        self.drawh(rend, cstart, cend)
-        self.drawv(rback, rend, cend)
-
-class NullGrid(Grid):
-    def drawh(self, r, cstart, cend):
         pass
+
+class SvgGrid:
+    def __init__(self, scale, h, w):
+        d = svgwrite.Drawing(size=(w * scale, h * scale))
+        self.dwg = d
+        g = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)", 
+            style="fill: none; stroke: black; stroke-width: 0.333px"))
+        self.g = g.add(d.g())
+        #self.textg = g.add(d.g(font_family="Verdana", font_size="0.33", fill="white", stroke="none", style="alignment-baseline: middle"))
 
     def drawl(self, r, cstart, cend, name):
-        pass
+        l = self.g.add(self.dwg.line((cstart - 0.333, r), (cend + 0.333, r)))
+        l.set_desc(title=name)
+        #self.textg.add(self.dwg.text(name, insert=(cstart, r)))
 
     def drawv(self, rstart, rend, c):
-        pass
+        self.g.add(self.dwg.line((c, rstart), (c, rend)))
 
-class SvgGrid(Grid):
-    def __init__(self, scale, rstep, h, w):
-        self.rstep = rstep
-        self.h = h
-        self.w = w
-        size = ((w * 4 + 1) * scale, ((h - 1) * rstep + 3) * scale)
-        self.dwg = svgwrite.Drawing(
-            size=size,
-            fill="black")
-        g = self.dwg.g(transform=f"scale({scale}) translate(1 1)")
-        self.dwg.add(g)
-        self.g = self.dwg.g()
-        g.add(self.g)
-        self.textg = self.dwg.g(fill="white", font_family="Verdana", font_size="1")
-        g.add(self.textg)
+    def drawfl(self, rstart, rend, cstart, cend):
+        self.g.add(self.dwg.polyline([
+            (cstart, rstart),
+            (cstart, rend),
+            (cend, rend),
+        ]))
 
-    def drawh(self, r, cstart, cend):
-        self.g.add(self.dwg.rect(
-            insert=(cstart * 4 + 2, r * self.rstep),
-            size=((cend - cstart) * 4 - 1, 1)))
+    def drawbl(self, rstart, rend, cstart, cend):
+        self.g.add(self.dwg.polyline([
+            (cstart, rend),
+            (cend, rend),
+            (cend, rstart),
+        ]))
 
-    def drawl(self, r, cstart, cend, name):
-        rect = self.dwg.rect(
-            insert=(cstart * 4, r * self.rstep),
-            size=((cend - cstart) * 4 + 3, 1))
-        rect.set_desc(title=name)
-        self.g.add(rect)
-        self.textg.add(self.dwg.text(name,
-            insert=(cstart * 4, r * self.rstep + 0.9)))
-
-    def drawv(self, rstart, rend, c):
-        self.g.add(self.dwg.rect(
-            insert=(c * 4 + 1, rstart * self.rstep + 1),
-            size=(1, (rend - rstart) * 4)))
+    def drawu(self, rstart, rend, rback, cstart, cend):
+        self.g.add(self.dwg.polyline([
+            (cstart, rstart),
+            (cstart, rend),
+            (cend, rend),
+            (cend, rback),
+        ]))
 
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
 
-def draw_expr(rstep, expr):
+def draw_expr(expr):
     ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)
     assert leftover is None
-    grid = SvgGrid(10, rstep, h, w)
+    grid = SvgGrid(40, h, w)
     ((r, c), leftover) = expr.draw(grid, {}, None, 0, 0)
     assert leftover is None
     assert h == r
