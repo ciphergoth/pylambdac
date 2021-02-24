@@ -72,7 +72,7 @@ class SvgGrid:
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
 
-def draw_expr(expr):
+def draw_expr(expr, outfile):
     ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)
     assert leftover is None
     grid = SvgGrid(40, h, w)
@@ -80,4 +80,4 @@ def draw_expr(expr):
     assert leftover is None
     assert h == r
     assert w == c
-    return grid
+    grid.write_image(outfile)
