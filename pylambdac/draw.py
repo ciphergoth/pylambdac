@@ -34,15 +34,17 @@ class SvgGrid:
     def __init__(self, scale, h, w):
         d = svgwrite.Drawing(size=(w * scale, h * scale))
         self.dwg = d
-        g = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)", 
-            style="fill: none; stroke: black; stroke-width: 0.333px"))
-        self.g = g.add(d.g())
-        #self.textg = g.add(d.g(font_family="Verdana", font_size="0.33", fill="white", stroke="none", style="alignment-baseline: middle"))
+        topg = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)", 
+            style="fill: none; stroke: black; stroke-width: 0.333px; stroke-linejoin: round"))
+        self.g = topg.add(d.g())
+        self.lg = topg.add(d.g()) #style="stroke: black; stroke-width: 0.667"
+        #self.textg = topg.add(d.g(font_family="Verdana", font_size="0.5", fill="#777", stroke="none"))
 
     def drawl(self, r, cstart, cend, name):
-        l = self.g.add(self.dwg.line((cstart - 0.333, r), (cend + 0.333, r)))
+        l = self.lg.add(self.dwg.line((cstart - 0.333, r), (cend + 0.333, r)))
         l.set_desc(title=name)
-        #self.textg.add(self.dwg.text(name, insert=(cstart, r)))
+        #self.textg.add(self.dwg.text(name, insert=((cstart + cend)/2, r),
+        #    dominant_baseline="middle", text_anchor="middle"))
 
     def drawv(self, rstart, rend, c):
         self.g.add(self.dwg.line((c, rstart), (c, rend)))
