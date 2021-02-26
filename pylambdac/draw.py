@@ -33,33 +33,41 @@ class NullGrid:
 
 
 class SvgGrid:
-    def __init__(self, scale, h, w):
+    def __init__(self, scale, h, w, text):
         d = svgwrite.Drawing(size=(w * scale, h * scale))
         self.dwg = d
         d.add(d.style(
             f" line, polyline {{fill: none; stroke: black; stroke-width: {1/3}px; stroke-linejoin: round}}"
             " .lrb {fill: white}"
             " .lr {fill: black}"
+            " text {font-family: Verdana; font-size: 0.5px; fill: white; text-align: center; alignment-baseline: central; text-anchor: middle}"
         ))
-        self.topg = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)"))
+        topg = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)"))
+        self.dg = topg.add(d.g())
         self.layers = []
-        # self.textg = topg.add(d.g(font_family="Verdana", font_size="0.5", fill="#777", stroke="none"))
+        if text:
+            self.tg = topg.add(d.g())
+        else:
+            self.tg = None
 
     def get_layer(self, r):
         while len(self.layers) <= r:
-            self.layers.append((self.topg.add(self.dwg.g()),
-                                self.topg.add(self.dwg.g())))
+            self.layers.append((self.dg.add(self.dwg.g()),
+                                self.dg.add(self.dwg.g())))
         return self.layers[r]
 
     def drawl(self, r, cstart, cend, name):
+        if self.tg:
+            self.tg.add(self.dwg.text(name, insert=((cstart + cend)/2, r)))
+            w = 0.5
+        else:
+            w = 1/3
         lg, g = self.get_layer(r)
-        lg.add(self.dwg.rect((cstart - 1/3, r - 0.2),
-                             (cend - cstart + 2/3, 0.4), class_="lrb"))
-        l = lg.add(self.dwg.rect((cstart - 1/3, r - 1/6),
-                                 (cend - cstart + 2/3, 1/3), class_="lr"))
+        lg.add(self.dwg.rect((cstart - 1/3, r - ((w + 1/15)/2)),
+                             (cend - cstart + 2/3, (w + 1/15)), class_="lrb"))
+        l = lg.add(self.dwg.rect((cstart - 1/3, r - w/2),
+                                 (cend - cstart + 2/3, w), class_="lr"))
         l.set_desc(title=name)
-        # self.textg.add(self.dwg.text(name, insert=((cstart + cend)/2, r),
-        #    dominant_baseline="middle", text_anchor="middle"))
 
     def drawv(self, rstart, rend, c):
         lg, g = self.get_layer(rstart)
@@ -93,7 +101,7 @@ class SvgGrid:
 def draw_expr(expr, outfile):
     ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)
     assert leftover is None
-    grid = SvgGrid(40, h, w)
+    grid = SvgGrid(40, h, w, False)
     ((r, c), leftover) = expr.draw(grid, {}, None, 0, 0)
     assert leftover is None
     assert h == r
