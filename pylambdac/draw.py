@@ -14,6 +14,7 @@
 
 import svgwrite
 
+
 class NullGrid:
     def drawl(self, r, cstart, cend, name):
         pass
@@ -30,49 +31,64 @@ class NullGrid:
     def drawu(self, rstart, rend, rback, cstart, cend):
         pass
 
+
 class SvgGrid:
     def __init__(self, scale, h, w):
         d = svgwrite.Drawing(size=(w * scale, h * scale))
         self.dwg = d
-        topg = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)", 
-            style="fill: none; stroke: black; stroke-width: 0.333px; stroke-linejoin: round"))
-        self.g = topg.add(d.g())
-        self.lg = topg.add(d.g()) #style="stroke: black; stroke-width: 0.667"
-        #self.textg = topg.add(d.g(font_family="Verdana", font_size="0.5", fill="#777", stroke="none"))
+        d.add(d.style(
+            f" line, polyline {{fill: none; stroke: black; stroke-width: {1/3}px; stroke-linejoin: round}}"
+            " .lrb {fill: white}"
+            " .lr {fill: black}"
+        ))
+        self.topg = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)"))
+        self.layers = []
+        # self.textg = topg.add(d.g(font_family="Verdana", font_size="0.5", fill="#777", stroke="none"))
+
+    def get_layer(self, r):
+        while len(self.layers) <= r:
+            self.layers.append((self.topg.add(self.dwg.g()),
+                                self.topg.add(self.dwg.g())))
+        return self.layers[r]
 
     def drawl(self, r, cstart, cend, name):
-        l = self.lg.add(self.dwg.line((cstart - 0.333, r), (cend + 0.333, r)))
+        lg, g = self.get_layer(r)
+        lg.add(self.dwg.rect((cstart - 1/3, r - 0.2),
+                             (cend - cstart + 2/3, 0.4), class_="lrb"))
+        l = lg.add(self.dwg.rect((cstart - 1/3, r - 1/6),
+                                 (cend - cstart + 2/3, 1/3), class_="lr"))
         l.set_desc(title=name)
-        #self.textg.add(self.dwg.text(name, insert=((cstart + cend)/2, r),
+        # self.textg.add(self.dwg.text(name, insert=((cstart + cend)/2, r),
         #    dominant_baseline="middle", text_anchor="middle"))
 
     def drawv(self, rstart, rend, c):
-        self.g.add(self.dwg.line((c, rstart), (c, rend)))
+        lg, g = self.get_layer(rstart)
+        g.add(self.dwg.line((c, rstart), (c, rend)))
 
     def drawfl(self, rstart, rend, cstart, cend):
-        self.g.add(self.dwg.polyline([
+        lg, g = self.get_layer(rstart)
+        g.add(self.dwg.polyline([
             (cstart, rstart),
             (cstart, rend),
             (cend, rend),
         ]))
 
     def drawbl(self, rstart, rend, cstart, cend):
-        self.g.add(self.dwg.polyline([
+        lg, g = self.get_layer(rstart)
+        g.add(self.dwg.polyline([
             (cstart, rend),
             (cend, rend),
             (cend, rstart),
         ]))
 
     def drawu(self, rstart, rend, rback, cstart, cend):
-        self.g.add(self.dwg.polyline([
-            (cstart, rstart),
-            (cstart, rend),
-            (cend, rend),
-            (cend, rback),
-        ]))
+        self.drawfl(rstart, rend, cstart, cend)
+        self.drawbl(rback, rend, cstart, cend)
+        return
 
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
+
 
 def draw_expr(expr, outfile):
     ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)
