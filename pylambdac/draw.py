@@ -14,6 +14,7 @@
 
 import svgwrite
 
+
 class NullGrid:
     def drawl(self, r, cstart, cend, name):
         pass
@@ -30,19 +31,18 @@ class NullGrid:
     def drawu(self, rstart, rend, rback, cstart, cend):
         pass
 
+
 class SvgGrid:
     def __init__(self, scale, h, w):
         d = svgwrite.Drawing(size=(w * scale, h * scale))
         self.dwg = d
-        g = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)", 
-            style="fill: none; stroke: black; stroke-width: 0.333px"))
-        self.g = g.add(d.g())
-        #self.textg = g.add(d.g(font_family="Verdana", font_size="0.33", fill="white", stroke="none", style="alignment-baseline: middle"))
+        d.add(d.style(
+            f"line, polyline {{fill: none; stroke: black; stroke-width: {1/3}px;}}"))
+        self.g = d.add(d.g(transform=f"scale({scale}) translate(0.5 0.5)"))
 
     def drawl(self, r, cstart, cend, name):
-        l = self.g.add(self.dwg.line((cstart - 0.333, r), (cend + 0.333, r)))
+        l = self.g.add(self.dwg.line((cstart - 1/3, r), (cend + 1/3, r)))
         l.set_desc(title=name)
-        #self.textg.add(self.dwg.text(name, insert=(cstart, r)))
 
     def drawv(self, rstart, rend, c):
         self.g.add(self.dwg.line((c, rstart), (c, rend)))
@@ -71,6 +71,7 @@ class SvgGrid:
 
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
+
 
 def draw_expr(expr, outfile):
     ((h, w), leftover) = expr.draw(NullGrid(), {}, None, 0, 0)

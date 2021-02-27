@@ -15,15 +15,18 @@
 import contextlib
 import re
 
+
 def findname(name, forbidden):
     prefix = re.fullmatch(r"(.*\D)?(\d*)", name).group(1)
-    if prefix is None: prefix = "_"
+    if prefix is None:
+        prefix = "_"
     i = 1
     while True:
         newname = f"{prefix}{i}"
         if newname not in forbidden:
             return newname
         i += 1
+
 
 class VarSubst:
     def __init__(self, var, expr, intarget):
@@ -61,6 +64,7 @@ class VarSubst:
         else:
             return var
 
+
 class SearchableStack():
     def __init__(self):
         self.s = {}
@@ -83,6 +87,7 @@ class SearchableStack():
         if r is None:
             return None
         return self.l - r
+
 
 class Term:
     def equiv(self, other):
@@ -125,6 +130,7 @@ class Term:
     def _optimize(self, names):
         return None
 
+
 class Var(Term):
     def __init__(self, name):
         self.name = name
@@ -162,6 +168,7 @@ class Var(Term):
 
     def _size(self, names):
         return 2 + names.search(self.name)
+
 
 class Apply(Term):
     def __init__(self, a, b):
@@ -229,6 +236,7 @@ class Apply(Term):
                 return ls
         return None
 
+
 class Lambda(Term):
     def __init__(self, v, e):
         self.v = v
@@ -246,7 +254,7 @@ class Lambda(Term):
         else:
             vars = []
             e = self._rolllambda(vars)
-            yield  f"λ{' '.join(vars)}. "
+            yield f"λ{' '.join(vars)}. "
             yield from e._str(False, False)
 
     def _prefixcode(self, names):
@@ -296,6 +304,7 @@ class Lambda(Term):
             return Lambda(self.v, e)
         return None
 
+
 class Magic(Term):
     def __init__(self, name):
         self.name = name
@@ -317,13 +326,17 @@ class Magic(Term):
         assert varsubst.var_subst(self) is self
         return self
 
+
 class MagicY(Magic):
     pcode = 'Y'
+
     def lambda_subst(self, expr, syms):
         return Apply(expr, Apply(self, expr))
 
+
 class MagicEager(Magic):
     pcode = 'E'
+
     def lambda_subst(self, expr, syms):
         if syms is None:
             return None
@@ -331,6 +344,7 @@ class MagicEager(Magic):
         if rd is None:
             return None
         return Apply(self, rd)
+
 
 def get_magic(name):
     m = {"Y": MagicY, "eager": MagicEager}
