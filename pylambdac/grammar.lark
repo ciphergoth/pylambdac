@@ -13,10 +13,11 @@
 // limitations under the License.
 
 directives: (directive ";")*
-?directive: let | magic | reduce | draw
+?directive: let | magic | reduce | asserteq | draw
 let: "let" VARWORD "=" expr
 magic: "magic" VARWORD
 reduce: "reduce" expr
+asserteq: "asserteq" subexpr subexpr
 draw: "draw" VARWORD
 
 ?expr: subexpr | apply

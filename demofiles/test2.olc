@@ -1,0 +1,11 @@
+let c0 = λf x. x;
+let csucc = λn f x. f (n f x);
+let c1 = csucc c0;
+let c2 = csucc c1;
+let c3 = csucc c2;
+let c4 = csucc c3;
+let cadd = λa b f x. (a f) ((b f) x);
+
+magic eager;
+
+asserteq (c4 eager val) (cadd c2 c2 eager val);

@@ -31,6 +31,14 @@ def optimize(expr):
         expr = newexpr
         print(f"optimized: {expr}")
 
+def reduce(expr, symbols):
+    while True:
+        print("    ", expr)
+        next = expr.reduce_once(symbols)
+        if next is None:
+            return expr
+        expr = next
+
 class Processor:
     def __init__(self, args):
         self._args = args
@@ -49,13 +57,16 @@ class Processor:
 
     def do_reduce(self, expr):
         print(f"reduce {expr}")
-        while True:
-            print("    ", expr)
-            next = expr.reduce_once(self._symbols)
-            if next is None:
-                print()
-                return
-            expr = next
+        reduce(expr, self._symbols)
+        print()
+
+    def do_asserteq(self, l, r):
+        print(f"asserteq ({l}) ({r})")
+        l = reduce(l, self._symbols)
+        print()
+        r = reduce(r, self._symbols)
+        print()
+        assert l.equiv(r)
 
     def do_draw(self, name):
         if self._args.outdir is None:
