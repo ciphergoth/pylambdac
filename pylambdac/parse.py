@@ -41,6 +41,12 @@ class Transformer(lark.Transformer):
             res = lterm.Apply(lterm.Apply(lterm.Var("cons"), v), res)
         return res
 
+    def nat(self, v):
+        res = lterm.Var("nat_zero")
+        for i in range(int(v.value)):
+            res = lterm.Apply(lterm.Var("nat_succ"), res)
+        return res
+
 transformer = Transformer()
 
 def parse_expr(expr):

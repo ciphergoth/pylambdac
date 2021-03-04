@@ -63,6 +63,9 @@ class VarSubst:
             return self.expr
         else:
             return var
+    
+    def touching(self, name):
+        return name in self.subst or name == self.var
 
 
 class SearchableStack():
@@ -349,3 +352,32 @@ class MagicEager(Magic):
 def get_magic(name):
     m = {"Y": MagicY, "eager": MagicEager}
     return m[name](name)
+
+# FIXME not used for now
+class Nat(Term):
+    def __init__(self, value):
+        self.value = value
+
+    def _str(self, bracketa, bracketl):
+        yield str(self.value)
+
+    def _prefixcode(self, names):
+        yield "nat"
+        yield str(self.value)
+
+    def reduce_once(self, syms):
+        if self.value == 0:
+            return Var("nat_zero")
+        else:
+            return Apply(Var("nat_succ"), Nat(self.value - 1))
+
+    def _variables(self, free):
+        yield "nat_zero"
+        if self.value > 0:
+            yield "nat_succ"
+
+    def var_subst(self, varsubst):
+        if varsubst.touching("nat_zero") or varsubst.touching("nat_succ"):
+            raise Exception("ouch")
+        return self
+
