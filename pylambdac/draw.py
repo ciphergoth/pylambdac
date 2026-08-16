@@ -74,10 +74,13 @@ class SvgGrid:
     def _valueline(self, bid, c, splits, bot):
         # Overdraw the line at c segment by segment: the binder's colour from
         # its lambda down to the first application bar it feeds, then each
-        # application's colour from its bar down to the next.
+        # application's colour from its bar down to the next. Each bar owns
+        # its full thickness: an incoming segment stops at the bar's top
+        # edge, and the outgoing one starts there, in the bar's own colour.
         if self.colours is None:
             return
-        rows = [bid[0]] + [r for (r, aid) in splits] + [bot]
+        edge = 1/6
+        rows = [bid[0]] + [r - edge for (r, aid) in splits] + [bot - edge]
         ids = [bid] + [aid for (r, aid) in splits]
         for (i, r0, r1) in zip(ids, rows, rows[1:]):
             self._line((c, r0), (c, r1), i)
