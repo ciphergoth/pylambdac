@@ -48,8 +48,9 @@ class MeasureGrid:
 
 
 class SvgGrid:
-    def __init__(self, scale, h, w, colours=None, margin=0):
+    def __init__(self, scale, h, w, colours=None, labels=False, margin=0):
         self.colours = colours
+        self.labels = labels
         d = svgwrite.Drawing(size=((w + margin) * scale, h * scale))
         self.dwg = d
         stroke = "black" if colours is None else PLUMBING
@@ -78,7 +79,7 @@ class SvgGrid:
     def drawl(self, r, cstart, cend, name, bid):
         l = self._line((cstart - 1/3, r), (cend + 1/3, r), bid)
         l.set_desc(title=name)
-        if self.colours is not None:
+        if self.labels:
             self.lg.add(self.dwg.text(f"λ{name}", insert=(cstart - 0.6, r + 0.17)))
 
     def drawv(self, bid, rend, c):
@@ -118,14 +119,14 @@ class SvgGrid:
         self.dwg.saveas(outfile, pretty=True)
 
 
-def draw_expr(expr, outfile, colour=False):
+def draw_expr(expr, outfile, colour=False, labels=False):
     mg = MeasureGrid()
     ((h, w), leftover) = expr.draw(mg, {}, None, 0, 0)
     assert leftover is None
-    if colour:
-        grid = SvgGrid(40, h, w, mg.colours(), mg.label_margin())
-    else:
-        grid = SvgGrid(40, h, w)
+    grid = SvgGrid(40, h, w,
+                   mg.colours() if colour else None,
+                   labels,
+                   mg.label_margin() if labels else 0)
     ((r, c), leftover) = expr.draw(grid, {}, None, 0, 0)
     assert leftover is None
     assert h == r
