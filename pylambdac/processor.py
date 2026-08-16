@@ -79,10 +79,11 @@ class Processor:
         print(f"flattened: {expr}")
         expr = optimize(expr)
         self._args.outdir.mkdir(parents=True, exist_ok=True)
-        target = f"{name}.svg"
-        draw.draw_expr(expr, self._args.outdir / target)
-        print(f"Expression of {expr.size()} BLC bits saved to {target}")
-        self.drawings.append(target)
+        for (suffix, colour) in [("", False), ("_colour", True)]:
+            target = f"{name}{suffix}.svg"
+            draw.draw_expr(expr, self._args.outdir / target, colour=colour)
+            print(f"Expression of {expr.size()} BLC bits saved to {target}")
+            self.drawings.append(target)
 
     def process(self, directives):
         for directive in directives.children:

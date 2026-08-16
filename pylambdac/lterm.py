@@ -89,6 +89,15 @@ class SearchableStack():
         return self.l - r
 
 
+def _stem(over, bot):
+    # Below its first application, a leftover line carries the application's
+    # output, not the variable itself; remember where that changeover is.
+    (bid, c, split) = over
+    if split is None:
+        split = bot
+    return (bid, c, split)
+
+
 class Term:
     def equiv(self, other):
         if not isinstance(other, Term):
@@ -160,11 +169,12 @@ class Var(Term):
         yield self.name
 
     def draw(self, grid, ll, toleave, ro, co):
+        bid = ll[self.name]
         if toleave is None:
-            grid.drawv(ll[self.name], ro, co)
+            grid.drawv(bid, ro, co)
             return ((ro + 1, co + 1), None)
         else:
-            return ((ro, co + 1), (ll[self.name], co))
+            return ((ro, co + 1), (bid, co, None))
 
     def _size(self, names):
         return 2 + names.search(self.name)
@@ -207,17 +217,17 @@ class Apply(Term):
         yield from self.b._variables(free)
 
     def draw(self, grid, ll, toleave, ro, co):
-        ((l_r, l_c), (l_over_r, l_over_c)) = self.a.draw(grid, ll, "R", ro, co)
-        ((r_r, r_c), (r_over_r, r_over_c)) = self.b.draw(grid, ll, "L", ro, l_c)
+        ((l_r, l_c), l_over) = self.a.draw(grid, ll, "R", ro, co)
+        ((r_r, r_c), r_over) = self.b.draw(grid, ll, "L", ro, l_c)
         bot = max(l_r, r_r)
         if toleave == "L":
-            grid.drawbl(r_over_r, bot, l_over_c, r_over_c)
-            return ((bot + 1, r_c), (l_over_r, l_over_c))
+            grid.drawbl(bot, l_over[1], r_over)
+            return ((bot + 1, r_c), _stem(l_over, bot))
         elif toleave == "R":
-            grid.drawfl(l_over_r, bot, l_over_c, r_over_c)
-            return ((bot + 1, r_c), (r_over_r, r_over_c))
+            grid.drawfl(bot, l_over, r_over[1])
+            return ((bot + 1, r_c), _stem(r_over, bot))
         else:
-            grid.drawu(l_over_r, bot, r_over_r, l_over_c, r_over_c)
+            grid.drawu(bot, l_over, r_over)
             return ((bot + 1, r_c), None)
 
     def _size(self, names):
@@ -287,10 +297,11 @@ class Lambda(Term):
 
     def draw(self, grid, ll, toleave, ro, co):
         old = ll.get(self.v, None)
-        ll[self.v] = ro
+        bid = (ro, co)
+        ll[self.v] = bid
         ((e_r, e_c), leftover) = self.e.draw(grid, ll, toleave, ro + 1, co)
         ll[self.v] = old
-        grid.drawl(ro, co, e_c - 1, self.v)
+        grid.drawl(ro, co, e_c - 1, self.v, bid)
         return ((e_r, e_c), leftover)
 
     def _size(self, names):
