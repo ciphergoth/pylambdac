@@ -89,13 +89,11 @@ class SearchableStack():
         return self.l - r
 
 
-def _stem(over, bot):
-    # Below its first application, a leftover line carries the application's
-    # output, not the variable itself; remember where that changeover is.
-    (bid, c, split) = over
-    if split is None:
-        split = bot
-    return (bid, c, split)
+def _stem(over, bot, aid):
+    # Below each application bar it attaches to, a leftover line carries that
+    # application's output; remember each changeover.
+    (bid, c, splits) = over
+    return (bid, c, splits + [(bot, aid)])
 
 
 class Term:
@@ -174,7 +172,7 @@ class Var(Term):
             grid.drawv(bid, ro, co)
             return ((ro + 1, co + 1), None)
         else:
-            return ((ro, co + 1), (bid, co, None))
+            return ((ro, co + 1), (bid, co, []))
 
     def _size(self, names):
         return 2 + names.search(self.name)
@@ -220,14 +218,15 @@ class Apply(Term):
         ((l_r, l_c), l_over) = self.a.draw(grid, ll, "R", ro, co)
         ((r_r, r_c), r_over) = self.b.draw(grid, ll, "L", ro, l_c)
         bot = max(l_r, r_r)
+        aid = (bot, l_over[1], "apply")
         if toleave == "L":
-            grid.drawbl(bot, l_over[1], r_over)
-            return ((bot + 1, r_c), _stem(l_over, bot))
+            grid.drawbl(bot, l_over[1], r_over, aid)
+            return ((bot + 1, r_c), _stem(l_over, bot, aid))
         elif toleave == "R":
-            grid.drawfl(bot, l_over, r_over[1])
-            return ((bot + 1, r_c), _stem(r_over, bot))
+            grid.drawfl(bot, l_over, r_over[1], aid)
+            return ((bot + 1, r_c), _stem(r_over, bot, aid))
         else:
-            grid.drawu(bot, l_over, r_over)
+            grid.drawu(bot, l_over, r_over, aid)
             return ((bot + 1, r_c), None)
 
     def _size(self, names):
