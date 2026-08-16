@@ -14,7 +14,7 @@
 
 import svgwrite
 
-PALETTE = ["#C4552D", "#2E8B6E", "#7C6FDC", "#C33D69", "#3E7CB8", "#A8790B"]
+PALETTE = ["#BF360C", "#2E7D32", "#4527A0", "#AD1457", "#1565C0", "#827717"]
 PLUMBING = "#8C8C8C"
 INK = "#444444"
 
