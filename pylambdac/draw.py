@@ -12,35 +12,82 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
+
 import svgwrite
 
-PALETTE = ["#BF360C", "#2E7D32", "#4527A0", "#AD1457", "#1565C0", "#827717"]
+PALETTE = ["#E10000", "#0000EE", "#00A800", "#FF7300", "#8A00E6", "#EE0088"]
 INK = "#444444"
+
+
+def _segments(over, bot):
+    # The line for a leftover, split where each application bar it feeds
+    # turns it into that application's output: [(id, rstart, rend)].
+    (bid, c, splits) = over
+    rows = [bid[0]] + [r for (r, aid) in splits] + [bot]
+    ids = [bid] + [aid for (r, aid) in splits]
+    return list(zip(ids, rows, rows[1:]))
 
 
 class MeasureGrid:
     def __init__(self):
         self.binders = []
-        self.applies = []
+        self.horizontals = []  # (row, cstart, cend, id)
+        self.verticals = []  # (col, rstart, rend, id)
+        self.attachments = []  # (id, id) meeting at a junction
+
+    def _over(self, over, bot, aid):
+        segs = _segments(over, bot)
+        for (i, r0, r1) in segs:
+            self.verticals.append((over[1], r0, r1, i))
+        ids = [i for (i, r0, r1) in segs] + [aid]
+        self.attachments.extend(zip(ids, ids[1:]))
 
     def drawl(self, r, cstart, cend, name, bid):
         self.binders.append((bid, name))
+        self.horizontals.append((r, cstart, cend, bid))
 
     def drawv(self, bid, rend, c):
-        pass
+        self.verticals.append((c, bid[0], rend, bid))
 
     def drawfl(self, bot, l_over, cend, aid):
-        self.applies.append(aid)
+        self._over(l_over, bot, aid)
+        self.horizontals.append((bot, l_over[1], cend, aid))
 
     def drawbl(self, bot, cstart, r_over, aid):
-        self.applies.append(aid)
+        self._over(r_over, bot, aid)
+        self.horizontals.append((bot, cstart, r_over[1], aid))
 
     def drawu(self, bot, l_over, r_over, aid):
-        self.applies.append(aid)
+        self._over(l_over, bot, aid)
+        self._over(r_over, bot, aid)
+        self.horizontals.append((bot, l_over[1], r_over[1], aid))
 
     def colours(self):
-        ids = [bid for (bid, name) in self.binders] + self.applies
-        return {i: PALETTE[n % len(PALETTE)] for (n, i) in enumerate(sorted(ids))}
+        # Greedy graph colouring: things that cross or touch get different
+        # colours, and ties go to the least-used colour for variety.
+        conflicts = collections.defaultdict(set)
+
+        def clash(a, b):
+            if a != b:
+                conflicts[a].add(b)
+                conflicts[b].add(a)
+
+        for (a, b) in self.attachments:
+            clash(a, b)
+        for (hr, hc0, hc1, hid) in self.horizontals:
+            for (vc, vr0, vr1, vid) in self.verticals:
+                if vr0 < hr < vr1 and hc0 <= vc <= hc1:
+                    clash(hid, vid)
+        counts = {p: 0 for p in PALETTE}
+        assigned = {}
+        for i in sorted(h[3] for h in self.horizontals):
+            used = {assigned[n] for n in conflicts[i] if n in assigned}
+            free = [p for p in PALETTE if p not in used] or PALETTE
+            pick = min(free, key=lambda p: (counts[p], PALETTE.index(p)))
+            counts[pick] += 1
+            assigned[i] = pick
+        return assigned
 
     def label_margin(self):
         maxlen = max((len(name) for (bid, name) in self.binders), default=0)
@@ -54,75 +101,53 @@ class SvgGrid:
         d = svgwrite.Drawing(size=((w + margin) * scale, h * scale))
         self.dwg = d
         d.add(d.style(
-            f"line, polyline {{fill: none; stroke: black; stroke-width: {1/3}px;}}"
+            f"line {{fill: none; stroke: black; stroke-width: {1/3}px;}}"
             f" text {{font: 0.5px sans-serif; fill: {INK}; text-anchor: end;"
             " paint-order: stroke; stroke: white; stroke-width: 0.15px;"
             " stroke-linejoin: round;}"))
         transform = f"scale({scale}) translate({margin + 0.5} 0.5)"
-        self.g = d.add(d.g(transform=transform))
-        # Labels go in a later group so lines never paint over them.
+        # Layered paint order: horizontals always go over verticals, so
+        # lambda lines and bars read as continuous, and labels top both.
+        self.vg = d.add(d.g(transform=transform))
+        self.hg = d.add(d.g(transform=transform))
         self.lg = d.add(d.g(transform=transform))
 
-    def _style(self, i):
+    def _line(self, group, start, end, i):
         if self.colours is None:
-            return {}
-        return {"style": f"stroke: {self.colours[i]};"}
+            return group.add(self.dwg.line(start, end))
+        return group.add(self.dwg.line(
+            start, end, style=f"stroke: {self.colours[i]};"))
 
-    def _line(self, start, end, i):
-        return self.g.add(self.dwg.line(start, end, **self._style(i)))
+    def _over(self, over, bot):
+        for (i, r0, r1) in _segments(over, bot):
+            self._line(self.vg, (over[1], r0), (over[1], r1), i)
 
-    def _valueline(self, bid, c, splits, bot):
-        # Overdraw the line at c segment by segment: the binder's colour from
-        # its lambda down to the first application bar it feeds, then each
-        # application's colour from its bar down to the next. Each bar owns
-        # its full thickness: an incoming segment stops at the bar's top
-        # edge, and the outgoing one starts there, in the bar's own colour.
-        if self.colours is None:
-            return
-        edge = 1/6
-        rows = [bid[0]] + [r - edge for (r, aid) in splits] + [bot - edge]
-        ids = [bid] + [aid for (r, aid) in splits]
-        for (i, r0, r1) in zip(ids, rows, rows[1:]):
-            self._line((c, r0), (c, r1), i)
+    def _bar(self, bot, cstart, cend, aid):
+        # Extended by half a stroke so it owns the corners with the
+        # verticals it meets.
+        self._line(self.hg, (cstart - 1/6, bot), (cend + 1/6, bot), aid)
 
     def drawl(self, r, cstart, cend, name, bid):
-        l = self._line((cstart - 1/3, r), (cend + 1/3, r), bid)
+        l = self._line(self.hg, (cstart - 1/3, r), (cend + 1/3, r), bid)
         l.set_desc(title=name)
         if self.labels:
             self.lg.add(self.dwg.text(f"λ{name}", insert=(cstart - 0.6, r + 0.17)))
 
     def drawv(self, bid, rend, c):
-        self._line((c, bid[0]), (c, rend), bid)
+        self._line(self.vg, (c, bid[0]), (c, rend), bid)
 
     def drawfl(self, bot, l_over, cend, aid):
-        (bid, cstart, splits) = l_over
-        self.g.add(self.dwg.polyline([
-            (cstart, bid[0]),
-            (cstart, bot),
-            (cend, bot),
-        ], **self._style(aid)))
-        self._valueline(bid, cstart, splits, bot)
+        self._over(l_over, bot)
+        self._bar(bot, l_over[1], cend, aid)
 
     def drawbl(self, bot, cstart, r_over, aid):
-        (bid, cend, splits) = r_over
-        self.g.add(self.dwg.polyline([
-            (cstart, bot),
-            (cend, bot),
-            (cend, bid[0]),
-        ], **self._style(aid)))
-        self._valueline(bid, cend, splits, bot)
+        self._over(r_over, bot)
+        self._bar(bot, cstart, r_over[1], aid)
 
     def drawu(self, bot, l_over, r_over, aid):
-        (lbid, cstart, lsplits) = l_over
-        (rbid, cend, rsplits) = r_over
-        self.g.add(self.dwg.polyline([
-            (cstart, lbid[0]),
-            (cstart, bot),
-            (cend, bot),
-            (cend, rbid[0]),
-        ], **self._style(aid)))
-        self._valueline(lbid, cstart, lsplits, bot)
-        self._valueline(rbid, cend, rsplits, bot)
+        self._over(l_over, bot)
+        self._over(r_over, bot)
+        self._bar(bot, l_over[1], r_over[1], aid)
 
     def write_image(self, outfile):
         self.dwg.saveas(outfile, pretty=True)
