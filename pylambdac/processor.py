@@ -81,7 +81,7 @@ class Processor:
         self._args.outdir.mkdir(parents=True, exist_ok=True)
         target = f"{name}.svg"
         draw.draw_expr(expr, self._args.outdir / target,
-                       colour=self._args.colour, labels=self._args.labels)
+                       color=self._args.color, labels=self._args.labels)
         print(f"Expression of {expr.size()} BLC bits saved to {target}")
         self.drawings.append(target)
 
