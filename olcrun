@@ -30,6 +30,8 @@ def file_text(tf):
 def parse_args():
     p = argparse.ArgumentParser(allow_abbrev=False)
     p.add_argument("--outdir", type=pathlib.Path)
+    p.add_argument("--colour", action="store_true",
+                   help="colour lines by the binder or application they carry")
     p.add_argument("--labels", action="store_true",
                    help="label each lambda line with its variable name")
     p.add_argument("olcfile", nargs='*', type=pathlib.Path)
