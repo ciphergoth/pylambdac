@@ -21,8 +21,8 @@ PALETTE = ["#B01B1B", "#1D4ED8", "#0F7A3D", "#C05717", "#8E24AA", "#0E7490"]
 INK = "#444444"
 
 
-def _oklab(colour):
-    rgb = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+def _oklab(color):
+    rgb = [int(color[i:i + 2], 16) / 255 for i in (1, 3, 5)]
     (r, g, b) = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
                  for c in rgb]
     l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b
@@ -35,8 +35,8 @@ def _oklab(colour):
 
 
 def _near():
-    # Palette colours closer than this perceptual distance (OKLab x100)
-    # count as confusable: the same rules that keep a colour from crossing
+    # Palette colors closer than this perceptual distance (OKLab x100)
+    # count as confusable: the same rules that keep a color from crossing
     # itself also keep it from crossing these.
     labs = {p: _oklab(p) for p in PALETTE}
     return {p: {q for q in PALETTE
@@ -90,9 +90,9 @@ class MeasureGrid:
         self._over(r_over, bot, aid)
         self.horizontals.append((bot, l_over[1], r_over[1], aid))
 
-    def colours(self):
-        # Greedy graph colouring: things that cross or touch get different
-        # colours, and ties go to the least-used colour for variety.
+    def colors(self):
+        # Greedy graph coloring: things that cross or touch get different
+        # colors, and ties go to the least-used color for variety.
         conflicts = collections.defaultdict(set)
 
         def clash(a, b):
@@ -124,8 +124,8 @@ class MeasureGrid:
 
 
 class SvgGrid:
-    def __init__(self, scale, h, w, colours=None, labels=False, margin=0):
-        self.colours = colours
+    def __init__(self, scale, h, w, colors=None, labels=False, margin=0):
+        self.colors = colors
         self.labels = labels
         d = svgwrite.Drawing(size=((w + margin) * scale, h * scale))
         self.dwg = d
@@ -142,10 +142,10 @@ class SvgGrid:
         self.lg = d.add(d.g(transform=transform))
 
     def _line(self, group, start, end, i):
-        if self.colours is None:
+        if self.colors is None:
             return group.add(self.dwg.line(start, end))
         return group.add(self.dwg.line(
-            start, end, style=f"stroke: {self.colours[i]};"))
+            start, end, style=f"stroke: {self.colors[i]};"))
 
     def _over(self, over, bot):
         for (i, r0, r1) in _segments(over, bot):
@@ -182,12 +182,12 @@ class SvgGrid:
         self.dwg.saveas(outfile, pretty=True)
 
 
-def draw_expr(expr, outfile, colour=False, labels=False):
+def draw_expr(expr, outfile, color=False, labels=False):
     mg = MeasureGrid()
     ((h, w), leftover) = expr.draw(mg, {}, None, 0, 0)
     assert leftover is None
     grid = SvgGrid(40, h, w,
-                   mg.colours() if colour else None,
+                   mg.colors() if color else None,
                    labels,
                    mg.label_margin() if labels else 0)
     ((r, c), leftover) = expr.draw(grid, {}, None, 0, 0)
