@@ -13,11 +13,38 @@
 # limitations under the License.
 
 import collections
+import math
 
 import svgwrite
 
-PALETTE = ["#E10000", "#0000EE", "#00A800", "#FF7300", "#8A00E6", "#EE0088"]
+PALETTE = ["#B01B1B", "#1D4ED8", "#0F7A3D", "#C05717", "#8E24AA", "#0E7490"]
 INK = "#444444"
+
+
+def _oklab(colour):
+    rgb = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    (r, g, b) = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+                 for c in rgb]
+    l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b
+    m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b
+    s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b
+    (l, m, s) = (l ** (1 / 3), m ** (1 / 3), s ** (1 / 3))
+    return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+            1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+            0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
+
+
+def _near():
+    # Palette colours closer than this perceptual distance (OKLab x100)
+    # count as confusable: the same rules that keep a colour from crossing
+    # itself also keep it from crossing these.
+    labs = {p: _oklab(p) for p in PALETTE}
+    return {p: {q for q in PALETTE
+                if 100 * math.dist(labs[p], labs[q]) < 15}
+            for p in PALETTE}
+
+
+NEAR = _near()
 
 
 def _segments(over, bot):
@@ -83,7 +110,9 @@ class MeasureGrid:
         assigned = {}
         for i in sorted(h[3] for h in self.horizontals):
             used = {assigned[n] for n in conflicts[i] if n in assigned}
-            free = [p for p in PALETTE if p not in used] or PALETTE
+            banned = set().union(set(), *(NEAR[p] for p in used))
+            free = ([p for p in PALETTE if p not in banned]
+                    or [p for p in PALETTE if p not in used] or PALETTE)
             pick = min(free, key=lambda p: (counts[p], PALETTE.index(p)))
             counts[pick] += 1
             assigned[i] = pick
