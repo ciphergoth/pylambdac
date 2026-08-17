@@ -30,12 +30,9 @@ More output from this program [on my blog](https://mindsarentmagic.org/2020/02/2
 
 `olcrun` interprets `.olc` files such  as those in the [`demofiles`](demofiles/) directory.
 
-Install [poetry](https://python-poetry.org/), then try
+Install [uv](https://docs.astral.sh/uv/), then try
 
-    alias poetry='python3 $HOME/.poetry/bin/poetry'
-
-    poetry update
-    poetry run ./olcrun --outdir=/tmp/out demofiles/*
+    uv run ./olcrun --outdir=/tmp/out demofiles/*
 
 If the file ends in `.md`, the file is parsed as Markdown, the blockcode parts are extracted,
 and this is then parsed as before. It's a very cheap and dirty form of literate programming :)
@@ -81,8 +78,8 @@ will additionally write the drawings as `.png` files to the directory named.
 
 ## Testing
 
-To run tests, use `poetry run ./tests/run_tests`.
+To run tests, use `uv run ./tests/run_tests`.
 
 Each file in the [`tests/testdata`](tests/testdata/) directory contains a list of question/answer pairs.  To
-guard against regressions, the `poetry run ./tests/rewrite_test` tool can be used to replace the
+guard against regressions, the `uv run ./tests/rewrite_test` tool can be used to replace the
 answers in such a file with the answers that the current version of the software generates.

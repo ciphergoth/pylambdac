@@ -1,0 +1,44 @@
+version = 1
+revision = 2
+requires-python = ">=3.7"
+
+[[package]]
+name = "lark-parser"
+version = "0.8.9"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/b1/2eec2f43b6b9d56a190e48b8f80fc0d365b5870619d67bcdadd9fee67ef4/lark-parser-0.8.9.tar.gz", hash = "sha256:78915e9e59c7a3068830fd2d2cd733f7ab0cbea2d7928ebfaac4f8df10e4e989", size = 294650, upload-time = "2020-06-16T11:58:29.747Z" }
+
+[[package]]
+name = "mistletoe"
+version = "0.7.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/37/6265ca977f30d5d412599e53c10ef697af2c4c308cf29e154a0302485050/mistletoe-0.7.2.tar.gz", hash = "sha256:24d0f18cc5f0381c2cfb8a24ef3de83eb9f7929cb7d0e71ecb164b671d86e6a3", size = 35834, upload-time = "2019-06-08T19:14:23.203Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/23/0c9c856ef73b58d8d2e40b2d028cc39cdb3a3f0b91775d4d4b7451e41f94/mistletoe-0.7.2-py3-none-any.whl", hash = "sha256:3e2d31b2fa6231ea2ee46981274ebac8d5e5736e3aad2d1cd449e2c053b7023b", size = 28599, upload-time = "2019-06-08T19:14:21.575Z" },
+]
+
+[[package]]
+name = "pylambdac"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "lark-parser" },
+    { name = "mistletoe" },
+    { name = "svgwrite" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lark-parser", specifier = ">=0.8.2,<0.9" },
+    { name = "mistletoe", specifier = ">=0.7.2,<0.8" },
+    { name = "svgwrite", specifier = ">=1.4,<2" },
+]
+
+[[package]]
+name = "svgwrite"
+version = "1.4.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/c1/263d4e93b543390d86d8eb4fc23d9ce8a8d6efd146f9427364109004fa9b/svgwrite-1.4.3.zip", hash = "sha256:a8fbdfd4443302a6619a7f76bc937fc683daf2628d9b737c891ec08b8ce524c3", size = 189516, upload-time = "2022-07-14T14:05:26.107Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/15/640e399579024a6875918839454025bb1d5f850bb70d96a11eabb644d11c/svgwrite-1.4.3-py3-none-any.whl", hash = "sha256:bb6b2b5450f1edbfa597d924f9ac2dd099e625562e492021d7dd614f65f8a22d", size = 67122, upload-time = "2022-07-14T14:05:24.459Z" },
+]

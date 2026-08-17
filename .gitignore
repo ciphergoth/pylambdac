@@ -1,4 +1,5 @@
 __pycache__
+.venv
 scratch
 .pytest_cache
 .DS_Store
